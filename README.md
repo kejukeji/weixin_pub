@@ -2,7 +2,11 @@ weixin_pub
 ==========
 运行文件管理：由于不同的控制级别和端口问题，需要自己创建运行文件
 1. 外部添加运行文件，这个和git管理一起
-2. 命名需要带有weixin_pub和个人信息，为了更好的管理和区分
+2. 命名需要带有weixin_pub和个人信息，为了更好的管理和区分，比如：
+lyw_weixin_pub.py
+server_weixin_pub.py
+test_server_weixin_pub.py
+test_weixin_pub.py
 
 
 配置文件管理：
