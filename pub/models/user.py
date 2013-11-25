@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 
 from .database import Base
 from .pub import Pub
-from ..utils.ex_password import generate_password, check_password
+from ..utils.ex_password import generate_password
 from ..utils.ex_time import todayfstr
 
 

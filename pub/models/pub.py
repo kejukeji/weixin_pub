@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from sqlalchemy import (Column, Integer, String, DATETIME)
+from sqlalchemy import (Column, Integer, String)
 
 from .database import Base
 
