@@ -1,4 +1,4 @@
-.py[ocd]
+*.py[ocd]
 .idea
 .setting
 views/setting.py
