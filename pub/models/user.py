@@ -58,7 +58,7 @@ class User(Base):
         self.name = kwargs.pop('name')
         self.admin = kwargs.pop('admin')
         self.sign_up_date = todayfstr()
-        self.password = self._get_password(kwargs.pop('password', None))
+        self.password = self._set_password(kwargs.pop('password', None))
         self.pub_id = kwargs.pop('pub_id', None)
         self.wei_xin = kwargs.pop('wei_xin', None)
         self.birthday = kwargs.pop('birthday', None)
@@ -67,22 +67,29 @@ class User(Base):
         """更新用户数据的函数"""
         self.name = kwargs.pop('name')
         self.admin = kwargs.pop('admin')
-        self.password = self._get_password(kwargs.pop('password', None))
+        self.password = self._update_password(kwargs.pop('password', None), self.password)
         self.pub_id = kwargs.pop('pub_id', None)
         self.wei_xin = kwargs.pop('wei_xin', None)
         self.birthday = kwargs.pop('birthday', None)
 
+    def _set_password(self, password):
+        """如果密码合法，返回加密后的密码，否则返回None"""
+        if not self._valid_password(password):
+            return None
+        return generate_password(password)
 
-    def _get_password(self, password):
-        """通过密码字符串生成加密的密码，如果密码为None，返回None"""
-
-        if not password.strip():
-            password = None
-
-        if password is not None:
+    def _update_password(self, password, enc_password):
+        if not self._valid_password(password):
+            return enc_password
+        if password != enc_password:  # 如果和之前的一样，说明没有变动
             return generate_password(password)
+        return enc_password
 
-        return password
+    def _valid_password(self, password):
+        """验证password合法性，不合法返回False，合法返回True"""
+        if (password is None) or (not password.strip()):
+            return False
+        return True
 
     def __repr__(self):
         return '<User(name: %s)>' % self.name
