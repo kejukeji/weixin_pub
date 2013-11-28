@@ -29,8 +29,12 @@ class Pub(Base):
         self.intro = kwargs.pop('intro', None)
 
     def update(self, **kwargs):
-        self.name = kwargs.pop('name')
-        self.intro = kwargs.pop('intro', None)
+        name = kwargs.pop('name', None)
+        intro = kwargs.pop('intro', None)
+        if name is not None:
+            self.name = name
+        if intro is not None:
+            self.intro = intro
 
     def __repr__(self):
         return '<Pub(name: %s)>' % self.name

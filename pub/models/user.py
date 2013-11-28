@@ -65,12 +65,23 @@ class User(Base):
 
     def update(self, **kwargs):
         """更新用户数据的函数"""
-        self.name = kwargs.pop('name')
-        self.admin = kwargs.pop('admin')
+        name = kwargs.pop('name', None)
+        admin = kwargs.pop('admin', None)
+        pub_id = kwargs.pop('pub_id', None)
+        wei_xin = kwargs.pop('wei_xin', None)
+        birthday = kwargs.pop('birthday', None)
+
+        if name is not None:
+            self.name = name
+        if admin is not None:
+            self.admin = admin
+        if pub_id is not None:
+            self.pub_id = pub_id
+        if wei_xin is not None:
+            self.wei_xin = wei_xin
+        if birthday is not None:
+            self.birthday = birthday
         self.password = self._update_password(kwargs.pop('password', None), self.password)
-        self.pub_id = kwargs.pop('pub_id', None)
-        self.wei_xin = kwargs.pop('wei_xin', None)
-        self.birthday = kwargs.pop('birthday', None)
 
     def _set_password(self, password):
         """如果密码合法，返回加密后的密码，否则返回None"""

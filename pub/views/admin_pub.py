@@ -4,14 +4,20 @@
 import logging
 
 from flask.ext.admin.contrib.sqla import ModelView
-from flask import flash
+from flask import flash, redirect, request, url_for
+from flask.ext.admin.base import expose
 from flask.ext.admin.babel import gettext
+from flask.ext.admin.model.helpers import get_mdict_item_or_list
+from flask.ext.admin.helpers import validate_form_on_submit
+from flask.ext.admin.form import get_form_opts
 from wtforms.fields import TextField, PasswordField
 from wtforms import validators
 
 from ..models.pub import Pub
 from ..models.user import User
 from ..utils.others import form_to_dict
+
+log = logging.getLogger("flask-admin.sqla")
 
 class PubView(ModelView):
     """后台添加酒吧和管理员视图"""
@@ -25,7 +31,7 @@ class PubView(ModelView):
         """改写form"""
         form_class = super(PubView, self).scaffold_form()
         form_class.user = TextField(label=u'酒吧管理员', validators=[validators.required()])
-        form_class.password = PasswordField(label=u'管理员密码', validators=[validators.required()])
+        form_class.password = TextField(label=u'管理员密码', validators=[validators.required()])
 
         return form_class
 
@@ -54,6 +60,82 @@ class PubView(ModelView):
 
         return True
 
+    def update_model(self, form, model):
+        """更新酒吧和酒吧管理员"""
+        try:
+            form_dict = form_to_dict(form)
+
+            pub = Pub.query.filter(Pub.id == model.id).first()
+            self._update_pub(pub, form_dict)
+            user = self._get_pub_admin(model.id)
+            if user is None:
+                user = self._get_user(form_dict, pub.id)
+                self.session.add(user)
+            else:
+                self._update_user(user, form_dict)
+
+            self._on_model_change(form, model, False)
+            self.session.commit()
+        except Exception as ex:
+            if self._debug:
+                raise
+
+            flash(gettext('Failed to update model. %(error)s', error=str(ex)), 'error')
+            log.exception('Failed to update model')
+            self.session.rollback()
+
+            return False
+        else:
+            self.after_model_change(form, model, False)
+
+        return True
+
+    @expose('/edit/', methods=('GET', 'POST'))
+    def edit_view(self):
+        """
+            Edit model view
+        """
+        return_url = request.args.get('url') or url_for('.index_view')
+
+        if not self.can_edit:
+            return redirect(return_url)
+
+        id = get_mdict_item_or_list(request.args, 'id')
+        if id is None:
+            return redirect(return_url)
+
+        model = self.get_one(id)
+
+        if model is None:
+            return redirect(return_url)
+
+        user = User.query.filter(User.pub_id == id).filter(User.admin == '111').first()
+        if user is None:
+            flash('这个酒吧还没有管理员哦')
+            model.user = None
+            model.password = None
+        else:
+            model.user = user.name
+            model.password = user.password
+
+        form = self.edit_form(obj=model)
+
+        if validate_form_on_submit(form):
+            if self.update_model(form, model):
+                if '_continue_editing' in request.form:
+                    flash(gettext('Model was successfully saved.'))
+                    return redirect(request.full_path)
+                else:
+                    return redirect(return_url)
+
+        return self.render(self.edit_template,
+                           model=model,
+                           form=form,
+                           form_opts=get_form_opts(self),
+                           form_rules=self._form_edit_rules,
+                           return_url=return_url)
+
+
     def _valid_form(self, form_dict):
         # 验证用户名是否重复
         if not self._has_user(form_dict['user']):
@@ -75,3 +157,15 @@ class PubView(ModelView):
     def _get_pub(self, form_dict):
         """通过字典返回一个pub类"""
         return Pub(name=form_dict['name'], intro=form_dict.get('intro', None))
+
+    def _get_pub_admin(self, pub_id, admin = '111'):
+        """通过酒吧id获得酒吧管理员"""
+        return User.query.filter(User.pub_id == pub_id).filter(User.admin == '111').first()
+
+    def _update_pub(self, pub, form_dict):
+        pub.update(name=form_dict.get('name'),
+                   intro=form_dict.get('intro', None))
+
+    def _update_user(self, user, form_dict):
+        user.update(name=form_dict.get('user'),
+                    password=form_dict.get('password'))

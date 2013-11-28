@@ -17,11 +17,8 @@ class SuperUserView(ModelView):
     """后台添加超级管理员的类"""
 
     page_size = 30
-    form_overrides = dict(
-        password=PasswordField
-    )
     form_choices = dict(
-        admin=[('1111', u'猫吧管理员')]
+        admin=[('1111', u'猫吧管理员'), ('111', u'酒吧管理员')]
     )
 
     def __init__(self, db, **kwargs):
