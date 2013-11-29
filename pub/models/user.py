@@ -82,5 +82,53 @@ class AdminUser(Base):
             return False
         return True
 
+    def check_password(self, new_password):
+        """检查密码的正确性"""
+        if not self._valid_password(new_password):
+            return False
+        if self.password == generate_password(new_password):
+            return True
+        return False
+
+    def is_superuser(self):
+        """猫吧超级超级管理员权限"""
+        if self.admin == '1111':
+            return True
+        return False
+
+    def is_normal_superuser(self):
+        """猫吧普通管理员权限"""
+        if self.admin == '1111' or self.admin == '1110':
+            return True
+        return False
+
+    def is_manageruser(self):
+        """酒吧超级管理员权限"""
+        if self.admin == '111':
+            return True
+        return False
+
+    def is_normal_manageruser(self):
+        """酒吧普通管理员权限"""
+        if self.admin == '111' or self.admin == '110':
+            return True
+        return False
+
+    @staticmethod
+    def is_authenticated():
+        return True
+
+    @staticmethod
+    def is_active():
+        return True
+
+    @staticmethod
+    def is_anonymous():
+        return False
+
+    def get_id(self):
+        return self.id
+
+
     def __repr__(self):
         return '<AdminUser(name: %s)>' % self.name
