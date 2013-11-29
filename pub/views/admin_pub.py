@@ -73,7 +73,8 @@ class PubView(ModelView):
                 user = self._get_user(form_dict, pub.id)
                 self.session.add(user)
             else:
-                self._update_user(user, form_dict)
+                if not self._update_user(user, form_dict):
+                    return False
 
             self._on_model_change(form, model, False)
             self.session.commit()
@@ -142,7 +143,7 @@ class PubView(ModelView):
         if not self._has_user(form_dict['user']):
             return True
 
-        return False  # todo-lyw 需要改变
+        return False
 
     def _has_user(self, user, model=None):
         """检查用户是否存在，不存在返回False"""
@@ -168,8 +169,15 @@ class PubView(ModelView):
                    intro=form_dict.get('intro', None))
 
     def _update_user(self, user, form_dict):
-        user.update(name=form_dict.get('user'),
-                    password=form_dict.get('password'))
+        """检查名字是否重复，然后添加"""
+        user_count = AdminUser.query.filter(AdminUser.name == form_dict.get('user')).count()
+        if (user.name == form_dict.get('user')) or (user_count == 0):
+            user.update(name=form_dict.get('user'),
+                        password=form_dict.get('password'))
+            return True
+
+        flash(u'用户名重复了', 'error')
+        return False
 
     def is_accessible(self):
         return login.current_user.is_normal_superuser()
