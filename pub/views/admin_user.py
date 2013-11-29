@@ -10,6 +10,7 @@ from sqlalchemy import or_
 from flask.ext.admin.base import expose
 from sqlalchemy.orm import joinedload
 from flask.ext.admin.contrib.sqla import tools
+from flask.ext import login
 
 from ..models.user import AdminUser
 from ..utils.others import form_to_dict
@@ -271,6 +272,9 @@ class SuperUserView(ModelView):
     def _has_user(self, name):
         """存在返回True，不存在返回False"""
         return bool(AdminUser.query.filter(AdminUser.name == name).count())
+
+    def is_accessible(self):
+        return login.current_user.is_normal_superuser()
 
 
 class ManagerUserView(SuperUserView):

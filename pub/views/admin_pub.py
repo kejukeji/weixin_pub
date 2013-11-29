@@ -12,6 +12,7 @@ from flask.ext.admin.helpers import validate_form_on_submit
 from flask.ext.admin.form import get_form_opts
 from wtforms.fields import TextField, PasswordField
 from wtforms import validators
+from flask.ext import login
 
 from ..models.pub import Pub
 from ..models.user import AdminUser
@@ -169,3 +170,6 @@ class PubView(ModelView):
     def _update_user(self, user, form_dict):
         user.update(name=form_dict.get('user'),
                     password=form_dict.get('password'))
+
+    def is_accessible(self):
+        return login.current_user.is_normal_superuser()
