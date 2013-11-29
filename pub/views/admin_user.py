@@ -11,7 +11,7 @@ from flask.ext.admin.base import expose
 from sqlalchemy.orm import joinedload
 from flask.ext.admin.contrib.sqla import tools
 
-from ..models.user import User
+from ..models.user import AdminUser
 from ..utils.others import form_to_dict
 from ..utils.ex_object import delete_attrs
 
@@ -26,12 +26,12 @@ class SuperUserView(ModelView):
     pub_user_filter = '1111'  # 过滤用户的标志
 
     def __init__(self, db, **kwargs):
-        ModelView.__init__(self, User, db, **kwargs)
+        ModelView.__init__(self, AdminUser, db, **kwargs)
 
     def scaffold_form(self):
         """改写form"""
         form_class = super(SuperUserView, self).scaffold_form()
-        delete_attrs(form_class, ['pub', 'sign_up_date', 'wei_xin', 'birthday'])
+        delete_attrs(form_class, ['pub', 'sign_up_date'])
 
         return form_class
 
@@ -85,7 +85,7 @@ class SuperUserView(ModelView):
         count_query = self.get_count_query()
 
         if admin is not None:
-            query = query.filter(User.admin == admin)
+            query = query.filter(AdminUser.admin == admin)
 
         # Apply search criteria
         if self._search_supported and search:
@@ -258,28 +258,28 @@ class SuperUserView(ModelView):
                                actions_confirmation=actions_confirmation)
 
     def _valid_form(self, form, model=None):
-        """检查form，放置用户名重复问题，添加猫吧超级管理员，那么用户名和管理员级别组合不能重复
+        """检查form，放置用户名重复问题，添加猫吧超级管理员
         """
         form_dic = form_to_dict(form)
         if model is None:
-            return not self._has_user(form_dic['name'], form_dic['admin'])
+            return not self._has_user(form_dic['name'])
         else:
             if str(model.name) == form_dic['name']:
                 return True
-            return not self._has_user(form_dic['name'], form_dic['admin'])
+            return not self._has_user(form_dic['name'])
 
-    def _has_user(self, name, admin):
+    def _has_user(self, name):
         """存在返回True，不存在返回False"""
-        return bool(User.query.filter(User.name == name).filter(User.admin == admin).count())
+        return bool(AdminUser.query.filter(AdminUser.name == name).count())
 
 
 class ManagerUserView(SuperUserView):
     """酒吧管理员的类"""
 
     form_choices = dict(
-        dict=[('111', u'酒吧管理员')]
+        admin=[('111', u'酒吧管理员')]
     )
     pub_user_filter = '111'
 
     def __init__(self, db, **kwargs):
-        ModelView.__init__(self, User, db, **kwargs)
+        ModelView.__init__(self, AdminUser, db, **kwargs)

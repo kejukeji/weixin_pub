@@ -9,7 +9,7 @@ from ..utils.ex_password import generate_password
 from ..utils.ex_time import todayfstr
 
 
-class User(Base):
+class AdminUser(Base):
     """ 对应于数据库的user表格
     id
     name 用户名，如果是管理员就是普通用户名；如果是会员，一般都是手机号
@@ -22,22 +22,12 @@ class User(Base):
          111 酒吧超级管理员，一个酒吧的管理员
          110 酒吧普通管理员
 
-          11 高级会员
-          10 普通会员
-
     pub_id 酒吧ID
         超级管理员(1111 1110)没有pub_id，可以管理所有的酒吧
-        其他的管理员(111 110)和会员(11 10)需要绑定到酒吧
-        注：可以用户名相同，而pub_id不同账户
-    wei_xin
-        微信相关的资料
-    birthday
-        公立生日
-
-    注：name和pub_id的组合不能重复
+        酒吧管理员需要绑定酒吧ID
     """
 
-    __tablename__ = 'user'
+    __tablename__ = 'admin_user'
 
     __table_args__ = {
         'mysql_engine': 'InnoDB',
@@ -45,14 +35,12 @@ class User(Base):
     }
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(16), nullable=False)
+    name = Column(String(16), nullable=False, unique=True)
     admin = Column(String(4), nullable=False)
     password = Column(String(64), nullable=True)
     sign_up_date = Column(DATETIME, nullable=True)
     pub_id = Column(Integer, ForeignKey(Pub.id, ondelete='cascade', onupdate='cascade'), nullable=True)
     pub = relationship(Pub)
-    wei_xin = Column(String(64), nullable=True)
-    birthday = Column(DATETIME, nullable=True)
 
     def __init__(self, **kwargs):
         self.name = kwargs.pop('name')
@@ -60,16 +48,12 @@ class User(Base):
         self.sign_up_date = todayfstr()
         self.password = self._set_password(kwargs.pop('password', None))
         self.pub_id = kwargs.pop('pub_id', None)
-        self.wei_xin = kwargs.pop('wei_xin', None)
-        self.birthday = kwargs.pop('birthday', None)
 
     def update(self, **kwargs):
         """更新用户数据的函数"""
         name = kwargs.pop('name', None)
         admin = kwargs.pop('admin', None)
         pub_id = kwargs.pop('pub_id', None)
-        wei_xin = kwargs.pop('wei_xin', None)
-        birthday = kwargs.pop('birthday', None)
 
         if name is not None:
             self.name = name
@@ -77,10 +61,6 @@ class User(Base):
             self.admin = admin
         if pub_id is not None:
             self.pub_id = pub_id
-        if wei_xin is not None:
-            self.wei_xin = wei_xin
-        if birthday is not None:
-            self.birthday = birthday
         self.password = self._update_password(kwargs.pop('password', None), self.password)
 
     def _set_password(self, password):
@@ -103,4 +83,4 @@ class User(Base):
         return True
 
     def __repr__(self):
-        return '<User(name: %s)>' % self.name
+        return '<AdminUser(name: %s)>' % self.name

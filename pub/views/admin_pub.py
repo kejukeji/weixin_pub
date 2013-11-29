@@ -14,7 +14,7 @@ from wtforms.fields import TextField, PasswordField
 from wtforms import validators
 
 from ..models.pub import Pub
-from ..models.user import User
+from ..models.user import AdminUser
 from ..utils.others import form_to_dict
 
 log = logging.getLogger("flask-admin.sqla")
@@ -109,7 +109,7 @@ class PubView(ModelView):
         if model is None:
             return redirect(return_url)
 
-        user = User.query.filter(User.pub_id == id).filter(User.admin == '111').first()
+        user = AdminUser.query.filter(AdminUser.pub_id == id).filter(AdminUser.admin == '111').first()
         if user is None:
             flash('这个酒吧还没有管理员哦')
             model.user = None
@@ -141,18 +141,18 @@ class PubView(ModelView):
         if not self._has_user(form_dict['user']):
             return True
 
-        return False
+        return False  # todo-lyw 需要改变
 
-    def _has_user(self, user, admin='111', model=None):
+    def _has_user(self, user, model=None):
         """检查用户是否存在，不存在返回False"""
         if model is None:
-            return bool(User.query.filter(User.name == user).filter(User.admin == admin).count())
+            return bool(AdminUser.query.filter(AdminUser.name == user).count())
         else:
-            return False # todo-lyw,这里需要继续编写
+            return False
 
     def _get_user(self, form_dict, pub_id):
         """通过字典返回一个user类"""
-        return User(name=form_dict['user'], password=form_dict['password'], admin='111', pub_id=pub_id)
+        return AdminUser(name=form_dict['user'], password=form_dict['password'], admin='111', pub_id=pub_id)
 
     def _get_pub(self, form_dict):
         """通过字典返回一个pub类"""
@@ -160,7 +160,7 @@ class PubView(ModelView):
 
     def _get_pub_admin(self, pub_id, admin = '111'):
         """通过酒吧id获得酒吧管理员"""
-        return User.query.filter(User.pub_id == pub_id).filter(User.admin == '111').first()
+        return AdminUser.query.filter(AdminUser.pub_id == pub_id).filter(AdminUser.admin == '111').first()
 
     def _update_pub(self, pub, form_dict):
         pub.update(name=form_dict.get('name'),
