@@ -129,6 +129,5 @@ class AdminUser(Base):
     def get_id(self):
         return self.id
 
-
     def __repr__(self):
         return '<AdminUser(name: %s)>' % self.name
