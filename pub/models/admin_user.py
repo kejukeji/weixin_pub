@@ -1,7 +1,5 @@
 # coding: utf-8
 
-"""普通会员的类"""
-
 from sqlalchemy import (Column, Integer, String, DATETIME, ForeignKey)
 from sqlalchemy.orm import relationship
 
@@ -11,8 +9,23 @@ from ..utils.ex_password import generate_password
 from ..utils.ex_time import todayfstr
 
 
-class User(Base):
-    """普通会员的类"""
+class AdminUser(Base):
+    """ 对应于数据库的user表格
+    id
+    name 用户名，如果是管理员就是普通用户名；如果是会员，一般都是手机号
+    password 管理员登陆密码；会员没有密码，手机号就OK
+    sign_up_date 用户注册时间
+    admin 权限控制，不是二进制，纯粹的字符
+        1111 超级管理员，就是能够管理所有酒吧的管理员
+        1110 普通管理员
+
+         111 酒吧超级管理员，一个酒吧的管理员
+         110 酒吧普通管理员
+
+    pub_id 酒吧ID
+        超级管理员(1111 1110)没有pub_id，可以管理所有的酒吧
+        酒吧管理员需要绑定酒吧ID
+    """
 
     __tablename__ = 'admin_user'
 

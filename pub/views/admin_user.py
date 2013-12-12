@@ -12,7 +12,7 @@ from sqlalchemy.orm import joinedload
 from flask.ext.admin.contrib.sqla import tools
 from flask.ext import login
 
-from ..models.user import AdminUser
+from ..models.admin_user import AdminUser
 from ..utils.others import form_to_dict
 from ..utils.ex_object import delete_attrs
 
@@ -283,6 +283,8 @@ class ManagerUserView(SuperUserView):
     form_choices = dict(
         admin=[('111', u'酒吧管理员')]
     )
+    can_create = False
+    can_delete = False
     pub_user_filter = '111'
 
     def __init__(self, db, **kwargs):

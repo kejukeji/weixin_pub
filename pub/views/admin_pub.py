@@ -15,7 +15,7 @@ from wtforms import validators
 from flask.ext import login
 
 from ..models.pub import Pub
-from ..models.user import AdminUser
+from ..models.admin_user import AdminUser
 from ..utils.others import form_to_dict
 
 log = logging.getLogger("flask-admin.sqla")
@@ -136,7 +136,6 @@ class PubView(ModelView):
                            form_opts=get_form_opts(self),
                            form_rules=self._form_edit_rules,
                            return_url=return_url)
-
 
     def _valid_form(self, form_dict):
         # 验证用户名是否重复
