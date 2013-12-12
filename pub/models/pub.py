@@ -1,11 +1,12 @@
 # coding: utf-8
 
-from sqlalchemy import (Column, Integer, String)
+from sqlalchemy import (Column, Integer, String, DATETIME)
 
 from .database import Base
+from .base_class import InitUpdate
 
 
-class Pub(Base):
+class Pub(Base, InitUpdate):
     """ 对应于数据库的pub表格
     id
     name 酒吧的名字
@@ -23,18 +24,15 @@ class Pub(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(32), nullable=False)
     intro = Column(String(256), nullable=True)
+    token = Column(String(128), nullable=True)
+    token_time = Column(DATETIME, nullable=True)
 
     def __init__(self, **kwargs):
-        self.name = kwargs.pop('name')
-        self.intro = kwargs.pop('intro', None)
+        self.init_value(('name',), kwargs)
+        self.init_none(('intro',), kwargs)
 
     def update(self, **kwargs):
-        name = kwargs.pop('name', None)
-        intro = kwargs.pop('intro', None)
-        if name is not None:
-            self.name = name
-        if intro is not None:
-            self.intro = intro
+        self.update_value(('name', 'intro', 'token', 'token_time'), kwargs)
 
     def __repr__(self):
         return '<Pub(name: %s)>' % self.name

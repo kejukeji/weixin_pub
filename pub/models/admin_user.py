@@ -7,9 +7,10 @@ from .database import Base
 from .pub import Pub
 from ..utils.ex_password import generate_password
 from ..utils.ex_time import todayfstr
+from .base_class import InitUpdate
 
 
-class AdminUser(Base):
+class AdminUser(Base, InitUpdate):
     """ 对应于数据库的user表格
     id
     name 用户名，如果是管理员就是普通用户名；如果是会员，一般都是手机号
@@ -43,24 +44,14 @@ class AdminUser(Base):
     pub = relationship(Pub)
 
     def __init__(self, **kwargs):
-        self.name = kwargs.pop('name')
-        self.admin = kwargs.pop('admin')
+        self.init_value(('name', 'admin'), kwargs)
+        self.init_none(('pub_id',), kwargs)
         self.sign_up_date = todayfstr()
         self.password = self._set_password(kwargs.pop('password', None))
-        self.pub_id = kwargs.pop('pub_id', None)
 
     def update(self, **kwargs):
         """更新用户数据的函数"""
-        name = kwargs.pop('name', None)
-        admin = kwargs.pop('admin', None)
-        pub_id = kwargs.pop('pub_id', None)
-
-        if name is not None:
-            self.name = name
-        if admin is not None:
-            self.admin = admin
-        if pub_id is not None:
-            self.pub_id = pub_id
+        self.update_value(('name', 'admin', 'pub_id'), kwargs)
         self.password = self._update_password(kwargs.pop('password', None), self.password)
 
     def _set_password(self, password):
