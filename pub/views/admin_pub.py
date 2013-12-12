@@ -10,15 +10,17 @@ from flask.ext.admin.babel import gettext
 from flask.ext.admin.model.helpers import get_mdict_item_or_list
 from flask.ext.admin.helpers import validate_form_on_submit
 from flask.ext.admin.form import get_form_opts
-from wtforms.fields import TextField, PasswordField
+from wtforms.fields import TextField
 from wtforms import validators
 from flask.ext import login
 
 from ..models.pub import Pub
 from ..models.admin_user import AdminUser
 from ..utils.others import form_to_dict
+from ..utils.ex_object import delete_attrs
 
 log = logging.getLogger("flask-admin.sqla")
+
 
 class PubView(ModelView):
     """后台添加酒吧和管理员视图"""
@@ -31,7 +33,8 @@ class PubView(ModelView):
     def scaffold_form(self):
         """改写form"""
         form_class = super(PubView, self).scaffold_form()
-        form_class.user = TextField(label=u'酒吧管理员', validators=[validators.required()])
+        delete_attrs(form_class, ('token', 'token_time'))
+        form_class.user = TextField(label=u'酒吧管理员', validators=[validators.required(), validators.length(max=16)])
         form_class.password = TextField(label=u'管理员密码', validators=[validators.required()])
 
         return form_class

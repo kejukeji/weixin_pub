@@ -38,7 +38,7 @@ class AdminUser(Base, InitUpdate):
     id = Column(Integer, primary_key=True)
     name = Column(String(16), nullable=False, unique=True)
     admin = Column(String(4), nullable=False)
-    password = Column(String(64), nullable=True)
+    password = Column(String(64), nullable=None)
     sign_up_date = Column(DATETIME, nullable=True)
     pub_id = Column(Integer, ForeignKey(Pub.id, ondelete='cascade', onupdate='cascade'), nullable=True)
     pub = relationship(Pub)
@@ -47,17 +47,17 @@ class AdminUser(Base, InitUpdate):
         self.init_value(('name', 'admin'), kwargs)
         self.init_none(('pub_id',), kwargs)
         self.sign_up_date = todayfstr()
-        self.password = self._set_password(kwargs.pop('password', None))
+        self.password = self._set_password(kwargs.pop('password'))
 
     def update(self, **kwargs):
         """更新用户数据的函数"""
         self.update_value(('name', 'admin', 'pub_id'), kwargs)
-        self.password = self._update_password(kwargs.pop('password', None), self.password)
+        self.password = self._update_password(kwargs.pop('password'), self.password)
 
     def _set_password(self, password):
-        """如果密码合法，返回加密后的密码，否则返回None"""
+        """如果密码合法，返回加密后的密码，否则返返回错误"""
         if not self._valid_password(password):
-            return None
+            raise ValueError
         return generate_password(password)
 
     def _update_password(self, password, enc_password):
