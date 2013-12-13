@@ -160,7 +160,7 @@ class PubView(ModelView):
 
     def _get_pub(self, form_dict):
         """通过字典返回一个pub类"""
-        return Pub(name=form_dict['name'], intro=form_dict.get('intro', None))
+        return Pub(name=form_dict['name'], intro=form_dict.get('intro', None), token=form_dict.get('token'))
 
     def _get_pub_admin(self, pub_id, admin = '111'):
         """通过酒吧id获得酒吧管理员"""
