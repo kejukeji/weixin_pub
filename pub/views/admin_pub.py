@@ -33,7 +33,7 @@ class PubView(ModelView):
     def scaffold_form(self):
         """改写form"""
         form_class = super(PubView, self).scaffold_form()
-        delete_attrs(form_class, ('token', 'token_time'))
+        delete_attrs(form_class, ('access_token_time', 'access_token'))
         form_class.user = TextField(label=u'酒吧管理员', validators=[validators.required(), validators.length(max=16)])
         form_class.password = TextField(label=u'管理员密码', validators=[validators.required()])
 
