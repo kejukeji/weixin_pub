@@ -21,4 +21,4 @@ def parse_request(request_dict, args):
 
 def get_pub(pub_id):
     """通过酒吧id获取酒吧"""
-    return Pub.query.fileter(Pub.id == pub_id).first()
+    return Pub.query.filter(Pub.id == pub_id).first()
