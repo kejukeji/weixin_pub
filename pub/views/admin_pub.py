@@ -162,13 +162,15 @@ class PubView(ModelView):
         """通过字典返回一个pub类"""
         return Pub(name=form_dict['name'], intro=form_dict.get('intro', None), token=form_dict.get('token'))
 
-    def _get_pub_admin(self, pub_id, admin = '111'):
+    def _get_pub_admin(self, pub_id, admin='111'):
         """通过酒吧id获得酒吧管理员"""
         return AdminUser.query.filter(AdminUser.pub_id == pub_id).filter(AdminUser.admin == '111').first()
 
     def _update_pub(self, pub, form_dict):
         pub.update(name=form_dict.get('name'),
-                   intro=form_dict.get('intro', None))
+                   intro=form_dict.get('intro', None),
+                   appid=form_dict.get('appid'),
+                   secret=form_dict.get('secret'))
 
     def _update_user(self, user, form_dict):
         """检查名字是否重复，然后添加"""

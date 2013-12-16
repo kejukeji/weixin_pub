@@ -14,6 +14,8 @@ class Pub(Base, InitUpdate):
     token 随机的字符串
     access_token_time 获取验证的时间
     access_token  服务器获取的验证
+    appid 微信号的appid
+    secret 微信号的secret
     """
 
     __tablename__ = 'pub'
@@ -29,13 +31,15 @@ class Pub(Base, InitUpdate):
     token = Column(String(128), nullable=False)
     access_token = Column(String(128), nullable=True)
     access_token_time = Column(DATETIME, nullable=True)
+    appid = Column(String(128), nullable=True)
+    secret = Column(String(128), nullable=True)
 
     def __init__(self, **kwargs):
         self.init_value(('name', 'token'), kwargs)
         self.init_none(('intro',), kwargs)
 
     def update(self, **kwargs):
-        self.update_value(('name', 'intro', 'access_token_time', 'access_token'), kwargs)
+        self.update_value(('name', 'intro', 'access_token_time', 'access_token', 'appid', 'secret'), kwargs)
 
     def __repr__(self):
         return '<Pub(name: %s)>' % self.name

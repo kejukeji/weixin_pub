@@ -5,7 +5,7 @@
 import hashlib
 
 
-def verify_token(token, timestamp, nonce, signature):
+def validate(token, timestamp, nonce, signature):
     """验证微信接入的参数，成功返回True 否则 False"""
 
     check_list = [token, timestamp, nonce]
