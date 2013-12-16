@@ -17,12 +17,12 @@ def create_menu(pub_id):
                        "type": "view",
                        "name": "品牌故事",
                        "url": "http://www.baidu.com"
-                   }，
+                   },
                    {
                        "type": "view",
                        "name": "近期活动",
                        "url": "http://www.baidu.com"
-                   }，
+                   },
                    {
                        "type": "view",
                        "name": "门店地址",
@@ -31,18 +31,18 @@ def create_menu(pub_id):
                ]
            },
            {
-               "name": "",
+               "name": "会员优惠",
                "sub_button": [
                    {
                        "type": "view",
                        "name": "成为粉丝会员",
                        "url": "http://www.baidu.com"
-                   }，
+                   },
                    {
                        "type": "view",
                        "name": "我的会员优惠",
                        "url": "http://www.baidu.com"
-                   }，
+                   },
                    {
                        "type": "view",
                        "name": "会员资料",
