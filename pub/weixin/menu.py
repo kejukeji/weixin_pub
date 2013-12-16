@@ -11,7 +11,7 @@ def create_menu(pub_id):
     test_string = """
  {
      "button":[
-     {
+      {
           "type":"click",
           "name":"今日歌曲",
           "key":"V1001_TODAY_MUSIC"
@@ -39,62 +39,64 @@ def create_menu(pub_id):
                "name":"赞一下我们",
                "key":"V1001_GOOD"
             }]
-       }]
- }
+       }
+     ]
+}
     """
 
-    menu_string = """{
-       "button": [
-           {
-               "name": "品牌主页",
-               "sub_button": [
-                   {
-                       "type": "view",
-                       "name": "品牌故事",
-                       "url": "http://www.baidu.com"
-                   },
-                   {
-                       "type": "view",
-                       "name": "近期活动",
-                       "url": "http://www.baidu.com"
-                   },
-                   {
-                       "type": "view",
-                       "name": "门店地址",
-                       "url": "http://www.baidu.com"
-                   }
-               ]
-           },
-           {
-               "name": "会员优惠",
-               "sub_button": [
-                   {
-                       "type": "view",
-                       "name": "成为粉丝会员",
-                       "url": "http://www.baidu.com"
-                   },
-                   {
-                       "type": "view",
-                       "name": "我的会员优惠",
-                       "url": "http://www.baidu.com"
-                   },
-                   {
-                       "type": "view",
-                       "name": "会员资料",
-                       "url": "http://www.baidu.com"
-                   }
-               ]
-           },
-           {
-               "type": "click",
-               "name": "每日抽奖"
-           }
-        ]}"""
+    menu_string = """
+{
+   "button": [
+       {
+           "name": "品牌主页",
+           "sub_button": [
+               {
+                   "type": "view",
+                   "name": "品牌故事",
+                   "url": "http://www.baidu.com"
+               },
+               {
+                   "type": "view",
+                   "name": "近期活动",
+                   "url": "http://www.baidu.com"
+               },
+               {
+                   "type": "view",
+                   "name": "门店地址",
+                   "url": "http://www.baidu.com"
+               }]
+       },
+       {
+           "name": "会员优惠",
+           "sub_button": [
+               {
+                   "type": "view",
+                   "name": "成为粉丝会员",
+                   "url": "http://www.baidu.com"
+               },
+               {
+                   "type": "view",
+                   "name": "我的会员优惠",
+                   "url": "http://www.baidu.com"
+               },
+               {
+                   "type": "view",
+                   "name": "会员资料",
+                   "url": "http://www.baidu.com"
+               }]
+       },
+       {
+           "type": "click",
+           "name": "每日抽奖",
+           "key": "Daily"
+       }
+   ]
+}"""
 
     token = get_token(pub)
 
     post_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + token
-    request = urllib2.urlopen(post_url, test_string.encode('utf-8'))
+    request = urllib2.urlopen(post_url, menu_string.encode('utf-8'))
 
     print request  # 日志消息
 
