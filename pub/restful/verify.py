@@ -10,8 +10,9 @@ import time
 
 
 def verify_developer(pub_id):
+    token = get_token(pub_id)
+
     if request.method == "GET":
-        token = get_token(pub_id)
         if validate(token, **parse_request(request.args, ("timestamp", "nonce", "signature"))):
             return make_response(request.args.get("echostr"))
         raise LookupError

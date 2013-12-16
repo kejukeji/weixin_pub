@@ -18,6 +18,7 @@ from ..models.pub import Pub
 from ..models.admin_user import AdminUser
 from ..utils.others import form_to_dict
 from ..utils.ex_object import delete_attrs
+from ..weixin.menu import create_menu
 
 log = logging.getLogger("flask-admin.sqla")
 
@@ -81,6 +82,7 @@ class PubView(ModelView):
 
             self._on_model_change(form, model, False)
             self.session.commit()
+            self.after_update_model(model.id)  # 创建菜单，更新数据库资料
         except Exception as ex:
             if self._debug:
                 raise
@@ -94,6 +96,10 @@ class PubView(ModelView):
             self.after_model_change(form, model, False)
 
         return True
+
+    def after_update_model(self, pub_id):
+        """创建菜单"""
+        create_menu(pub_id)
 
     @expose('/edit/', methods=('GET', 'POST'))
     def edit_view(self):
