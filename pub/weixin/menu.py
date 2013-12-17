@@ -43,11 +43,6 @@ def create_menu(pub_id):
                    "type": "click",
                    "name": "我的会员优惠",
                    "key": "discount"
-               },
-               {
-                   "type": "click",
-                   "name": "会员资料",
-                   "key": "information"
                }
            ]
        },
