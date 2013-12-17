@@ -15,19 +15,19 @@ def create_menu(pub_id):
            "name": "品牌主页",
            "sub_button": [
                {
-                   "type": "view",
+                   "type": "click",
                    "name": "品牌故事",
-                   "url": "http://www.baidu.com"
+                   "key": "story"
                },
                {
-                   "type": "view",
+                   "type": "click",
                    "name": "近期活动",
-                   "url": "http://www.baidu.com"
+                   "key": "activity"
                },
                {
-                   "type": "view",
+                   "type": "click",
                    "name": "门店地址",
-                   "url": "http://www.baidu.com"
+                   "key": "address"
                }
            ]
        },
@@ -35,26 +35,26 @@ def create_menu(pub_id):
            "name": "会员优惠",
            "sub_button": [
                {
-                   "type": "view",
+                   "type": "click",
                    "name": "成为粉丝会员",
-                   "url": "http://www.baidu.com"
+                   "key": "member"
                },
                {
-                   "type": "view",
+                   "type": "click",
                    "name": "我的会员优惠",
-                   "url": "http://www.baidu.com"
+                   "key": "discount"
                },
                {
-                   "type": "view",
+                   "type": "click",
                    "name": "会员资料",
-                   "url": "http://www.baidu.com"
+                   "key": "information"
                }
            ]
        },
        {
            "type": "click",
            "name": "每日抽奖",
-           "key": "Daily"
+           "key": "daily"
        }
    ]
 }"""

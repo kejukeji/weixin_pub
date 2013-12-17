@@ -9,7 +9,7 @@ from .tools import get_token, parse_request
 import time
 
 
-def verify_developer(pub_id):
+def weixin(pub_id):
     token = get_token(pub_id)
 
     if request.method == "GET":

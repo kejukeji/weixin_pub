@@ -24,5 +24,5 @@ admin.add_view(PubView(db, name=u'酒吧管理'))
 admin.add_view(UserView(db, name=u'会员管理'))
 
 # 微信接口处理路径
-from .restful.verify import verify_developer
-app.add_url_rule('/weixin/pub/<int:pub_id>', 'verify_developer', verify_developer, methods=('GET', 'POST'))
+from .restful.verify import weixin
+app.add_url_rule('/weixin/pub/<int:pub_id>', 'weixin', weixin, methods=('GET', 'POST'))
