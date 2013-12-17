@@ -27,6 +27,35 @@ class PubView(ModelView):
     """后台添加酒吧和管理员视图"""
 
     page_size = 30
+    can_delete = False
+    column_display_pk = True
+    column_default_sort = ('id', True)
+    column_labels = dict(
+        id=u'ID',
+        name=u'酒吧名称',
+        intro=u'酒吧简介',
+        token=u'Token',
+        address=u'酒吧地址',
+        tel=u'联系方式',
+        create_time=u'创建时间',
+        stop_time=u'运营截止时间',
+        status=u'运营状态'
+    )
+    column_descriptions = dict(
+        token=u'四位，使用数字或者字母，比如3456或者34ab，不能有其他的符号，创建酒吧的时候一定要填写。参考用户手册。',
+        appid=u'创建酒吧的时候无需填写，第二次更新酒吧的时候必须填写，以后不要有改动。参考用户手册。',
+        secret=u'创建酒吧的时候无需填写，第二次更新酒吧的时候必须填写，以后不要有改动。参考用户手册。',
+        stop_time=u'有效运营的截止时间。',
+        status=u'运营状态'
+    )
+    column_exclude_list = ('intro', 'access_token', 'access_token_time', 'secret', 'address', 'tel',
+                           'create_time', 'base_path', 'rel_path', 'pic_name', 'logo')
+    column_choices = dict(
+        status=[(0, u'暂停'), (1, u'运营')]
+    )
+    form_choices = dict(
+        status=[('0', u'暂停'), ('1', u'运营')]
+    )
 
     def __init__(self, db, **kwargs):
         super(PubView, self).__init__(Pub, db, **kwargs)
@@ -34,7 +63,8 @@ class PubView(ModelView):
     def scaffold_form(self):
         """改写form"""
         form_class = super(PubView, self).scaffold_form()
-        delete_attrs(form_class, ('access_token_time', 'access_token'))
+        delete_attrs(form_class, ('access_token_time', 'access_token', 'address', 'tel', 'base_path', 'rel_path',
+                                  'pic_name', 'logo', 'create_time'))
         form_class.user = TextField(label=u'酒吧管理员', validators=[validators.required(), validators.length(max=16)])
         form_class.password = TextField(label=u'管理员密码', validators=[validators.required()])
 
@@ -166,7 +196,11 @@ class PubView(ModelView):
 
     def _get_pub(self, form_dict):
         """通过字典返回一个pub类"""
-        return Pub(name=form_dict['name'], intro=form_dict.get('intro', None), token=form_dict.get('token'))
+        return Pub(name=form_dict['name'],
+                   intro=form_dict.get('intro', None),
+                   token=form_dict.get('token'),
+                   status=form_dict.get('status'),
+                   stop_time=form_dict.get('stop_time', None))
 
     def _get_pub_admin(self, pub_id, admin='111'):
         """通过酒吧id获得酒吧管理员"""
@@ -176,7 +210,9 @@ class PubView(ModelView):
         pub.update(name=form_dict.get('name'),
                    intro=form_dict.get('intro', None),
                    appid=form_dict.get('appid'),
-                   secret=form_dict.get('secret'))
+                   secret=form_dict.get('secret'),
+                   stop_time=form_dict.get('stop_time', None),
+                   status=form_dict.get('status'))
 
     def _update_user(self, user, form_dict):
         """检查名字是否重复，然后添加"""

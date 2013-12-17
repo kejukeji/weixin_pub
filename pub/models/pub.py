@@ -1,9 +1,10 @@
 # coding: utf-8
 
-from sqlalchemy import (Column, Integer, String, DATETIME)
+from sqlalchemy import (Column, Integer, String, DATETIME, Boolean)
 
 from .database import Base
 from .base_class import InitUpdate
+from ..utils.ex_time import todayfstr
 
 
 class Pub(Base, InitUpdate):
@@ -33,13 +34,24 @@ class Pub(Base, InitUpdate):
     access_token_time = Column(DATETIME, nullable=True)
     appid = Column(String(128), nullable=True)
     secret = Column(String(128), nullable=True)
+    address = Column(String(128), nullable=True)
+    tel = Column(String(64), nullable=True)
+    create_time = Column(DATETIME, nullable=True)
+    stop_time = Column(DATETIME, nullable=True)
+    status = Column(Boolean, nullable=False)
+    base_path = Column(String(128), nullable=True)
+    rel_path = Column(String(128), nullable=True)
+    pic_name = Column(String(128), nullable=True)
+    logo = Column(String(128), nullable=True)
 
     def __init__(self, **kwargs):
-        self.init_value(('name', 'token'), kwargs)
-        self.init_none(('intro',), kwargs)
+        self.init_value(('name', 'token', 'status'), kwargs)
+        self.init_none(('intro', 'stop_time'), kwargs)
+        self.create_time = todayfstr()
 
     def update(self, **kwargs):
-        self.update_value(('name', 'intro', 'access_token_time', 'access_token', 'appid', 'secret'), kwargs)
+        self.update_value(('name', 'intro', 'access_token_time', 'access_token', 'appid', 'secret',
+                           'address', 'tel', 'create_time', 'stop_time', 'status'), kwargs)
 
     def __repr__(self):
         return '<Pub(name: %s)>' % self.name
