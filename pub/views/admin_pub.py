@@ -2,6 +2,7 @@
 
 """后台添加新酒吧"""
 import logging
+import os
 
 from flask.ext.admin.contrib.sqla import ModelView
 from flask import flash, redirect, request, url_for
@@ -10,7 +11,7 @@ from flask.ext.admin.babel import gettext
 from flask.ext.admin.model.helpers import get_mdict_item_or_list
 from flask.ext.admin.helpers import validate_form_on_submit
 from flask.ext.admin.form import get_form_opts
-from wtforms.fields import TextField
+from wtforms.fields import TextField, FileField
 from wtforms import validators
 from flask.ext import login
 from sqlalchemy import or_
@@ -20,8 +21,12 @@ from flask.ext.admin.contrib.sqla import tools
 from ..models.pub import Pub
 from ..models.admin_user import AdminUser
 from ..utils.others import form_to_dict
+from ..utils.ex_file import time_file_name, allowed_file_extension
 from ..utils.ex_object import delete_attrs
 from ..weixin.menu import create_menu
+from werkzeug import secure_filename
+
+from ..setting import (PICTURE_ALLOWED_EXTENSION, PUB_PICTURE_BASE_PATH, PUB_PICTURE_REL_PATH)
 
 log = logging.getLogger("flask-admin.sqla")
 
@@ -252,6 +257,8 @@ class SinglePubView(PubView):
                                   'stop_time', 'status', 'base_path', 'rel_path', 'pic_name', 'logo'))
         form_class.user = TextField(label=u'酒吧管理员', validators=[validators.required(), validators.length(max=16)])
         form_class.password = TextField(label=u'管理员密码', validators=[validators.required()])
+        form_class.picture = FileField(label=u'酒吧图片',
+                                       description=u'为了更好的展示效果，严格使用640 * 288的图片，仅支持png与jpeg(jpg)格式')
 
         return form_class
 
@@ -275,6 +282,14 @@ class SinglePubView(PubView):
 
             self._on_model_change(form, model, False)
             self.session.commit()
+            flash(u'用户资料与酒吧资料保存成功', 'info')
+
+            pub_pictures = request.files.getlist("picture")
+            if not save_pub_pictures(pub_pictures, model, update=1):
+                return False  # 保存图片， 同时更新model的路径消息
+
+            self.session.commit()  # 保存图片资料
+
             self.after_update_model(model.id)  # 创建菜单，更新数据库资料
         except Exception as ex:
             if self._debug:
@@ -293,8 +308,8 @@ class SinglePubView(PubView):
     def _update_pub(self, pub, form_dict):
         pub.update(name=form_dict.get('name'),
                    intro=form_dict.get('intro', None),
-                   appid=form_dict.get('address'),
-                   secret=form_dict.get('tel'))
+                   address=form_dict.get('address'),
+                   tel=form_dict.get('tel'))
 
     def get_list(self, page, sort_column, sort_desc, search, filters, execute=True, pub_id=None):
         """
@@ -506,3 +521,33 @@ class SinglePubView(PubView):
             pub_id = None
 
         return pub_id
+
+
+def save_pub_pictures(pictures, model, update=None):
+    """保存酒吧图片，同时删除原来的图片"""
+
+    for picture in pictures:
+        if (update is not None) and (model is not None):
+            old_picture = str(model.base_path) + str(model.rel_path) + '/' + str(model.pic_name)
+        if picture.filename == '':  # 或许没有图片
+            return True
+        if not allowed_file_extension(picture.filename, PICTURE_ALLOWED_EXTENSION):
+            flash(u'图片格式不支持啊，png，jpeg支持', 'error')
+            return False
+        upload_name = picture.filename
+        base_path = PUB_PICTURE_BASE_PATH
+        rel_path = PUB_PICTURE_REL_PATH
+        pic_name = time_file_name(secure_filename(upload_name))
+        picture.save(os.path.join(base_path+rel_path+'/', pic_name))
+
+        model.base_path = base_path
+        model.rel_path = rel_path
+        model.pic_name = pic_name
+
+        if (update is not None) and (model is not None):
+            try:
+                os.remove(old_picture)
+            except:
+                flash("remove %s failed!", old_picture)
+
+        return True

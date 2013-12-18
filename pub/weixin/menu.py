@@ -2,6 +2,7 @@
 
 import urllib2
 import json
+from flask import flash
 from ..models.pub import Pub
 
 
@@ -23,11 +24,6 @@ def create_menu(pub_id):
                    "type": "click",
                    "name": "近期活动",
                    "key": "activity"
-               },
-               {
-                   "type": "click",
-                   "name": "门店地址",
-                   "key": "address"
                }
            ]
        },
@@ -54,7 +50,11 @@ def create_menu(pub_id):
    ]
 }"""
 
-    access_token = get_token(pub)
+    try:
+        access_token = get_token(pub)
+    except:
+        flash(u'创建酒吧菜单失败', 'info')
+        return
 
     post_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + access_token
     request = urllib2.urlopen(post_url, menu_string.encode('utf-8'))
