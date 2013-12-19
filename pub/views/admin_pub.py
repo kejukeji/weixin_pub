@@ -158,6 +158,8 @@ class PubView(ModelView):
         if model is None:
             return redirect(return_url)
 
+        model.status = ((model.status or 0) and 1)  # 使用1与0
+
         user = AdminUser.query.filter(AdminUser.pub_id == id).filter(AdminUser.admin == '111').first()
         if user is None:
             flash('这个酒吧还没有管理员哦')

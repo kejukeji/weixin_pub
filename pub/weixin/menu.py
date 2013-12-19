@@ -1,7 +1,5 @@
 # coding: utf-8
 
-import urllib2
-import json
 from flask import flash
 from ..models.pub import Pub
 from .webchat import MENU_STRING, WebChat
