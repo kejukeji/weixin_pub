@@ -22,7 +22,7 @@ def create_menu(pub_id):
                },
                {
                    "type": "click",
-                   "name": "近期活动",
+                   "name": "优惠活动",
                    "key": "activity"
                }
            ]
