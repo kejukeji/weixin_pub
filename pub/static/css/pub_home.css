@@ -27,3 +27,7 @@ hr {
 .block p {
     line-height: 132%;
 }
+
+#footer {
+    margin-top: 40px;
+}
