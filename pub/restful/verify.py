@@ -7,13 +7,15 @@ from xml.etree import ElementTree as ET
 from pub.weixin.verify import validate
 from .tools import get_token, parse_request
 import time
+from ..weixin.webchat import MENU_STRING, WebChat
 
 
 def weixin(pub_id):
     token = get_token(pub_id)
+    web_chat = WebChat(token)
 
     if request.method == "GET":
-        if validate(token, **parse_request(request.args, ("timestamp", "nonce", "signature"))):
+        if web_chat.validate(**parse_request(request.args, ("timestamp", "nonce", "signature"))):
             return make_response(request.args.get("echostr"))
         raise LookupError
 

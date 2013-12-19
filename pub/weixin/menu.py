@@ -4,73 +4,20 @@ import urllib2
 import json
 from flask import flash
 from ..models.pub import Pub
+from .webchat import MENU_STRING, WebChat
 
 
 def create_menu(pub_id):
     pub = Pub.query.filter(Pub.id == pub_id).first()
+    web_chat = WebChat(pub.token)
+    web_chat.update(pub.appid, pub.secret)
 
-    menu_string = """
-{
-   "button": [
-       {
-           "name": "品牌主页",
-           "sub_button": [
-               {
-                   "type": "view",
-                   "name": "品牌故事",
-                   "url": "$url$"
-               },
-               {
-                   "type": "click",
-                   "name": "优惠活动",
-                   "key": "activity"
-               }
-           ]
-       },
-       {
-           "name": "会员优惠",
-           "sub_button": [
-               {
-                   "type": "click",
-                   "name": "成为粉丝会员",
-                   "key": "member"
-               },
-               {
-                   "type": "click",
-                   "name": "我的会员优惠",
-                   "key": "discount"
-               }
-           ]
-       },
-       {
-           "type": "click",
-           "name": "每日抽奖",
-           "key": "daily"
-       }
-   ]
-}"""
+    menu_string = render_string(pub_id, MENU_STRING)
 
     try:
-        access_token = get_token(pub)
+        web_chat.create_menu(menu_string)
     except:
-        flash(u'创建酒吧菜单失败', 'info')
-        return
-
-    post_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + access_token
-    menu_string = render_string(pub_id, menu_string)
-    request = urllib2.urlopen(post_url, menu_string.encode('utf-8'))
-
-    print request  # 日志消息
-
-
-def get_token(pub):
-    get_token_url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='\
-                    + str(pub.appid) + '&secret=' + str(pub.secret)
-
-    f = urllib2.urlopen(get_token_url)
-    json_string = f.read()
-
-    return json.loads(json_string)['access_token']
+        flash("创建微信菜单失败，由于网速的问题会有偶尔的失败")
 
 
 def render_string(pub_id, menu_string):
