@@ -28,3 +28,7 @@ admin.add_view(UserView(db, name=u'会员管理'))
 # 微信接口处理路径
 from .restful.verify import weixin
 app.add_url_rule('/weixin/pub/<int:pub_id>', 'weixin', weixin, methods=('GET', 'POST'))
+
+# 微信页面
+from .views.web import pub_home
+app.add_url_rule('/pub/<int:pub_id>', 'pub_home', pub_home, methods=('GET', 'POST'))

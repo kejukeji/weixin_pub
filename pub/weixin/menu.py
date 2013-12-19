@@ -16,9 +16,9 @@ def create_menu(pub_id):
            "name": "品牌主页",
            "sub_button": [
                {
-                   "type": "click",
+                   "type": "view",
                    "name": "品牌故事",
-                   "key": "story"
+                   "url": "$url$"
                },
                {
                    "type": "click",
@@ -57,6 +57,7 @@ def create_menu(pub_id):
         return
 
     post_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + access_token
+    menu_string = render_string(pub_id, menu_string)
     request = urllib2.urlopen(post_url, menu_string.encode('utf-8'))
 
     print request  # 日志消息
@@ -70,3 +71,8 @@ def get_token(pub):
     json_string = f.read()
 
     return json.loads(json_string)['access_token']
+
+
+def render_string(pub_id, menu_string):
+    url = "http://weixin.kejukeji.com/pub/" + str(pub_id)
+    return menu_string.replace("$url$", url)
