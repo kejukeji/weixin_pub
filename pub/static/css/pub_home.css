@@ -22,8 +22,8 @@ hr {
 }
 
 .block .title {
-    font: 20px italic bold;
+    font: 120% bold;
 }
 .block p {
-    line-height: 20px;
+    line-height: 132%;
 }
