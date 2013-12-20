@@ -47,7 +47,7 @@ def response_event(MsgType, xml_recv, web_chat, pub_id):
     ToUserName = xml_recv.find("ToUserName").text
     FromUserName = xml_recv.find("FromUserName").text
 
-    if (MsgType == 'click') and (EventKey == 'story'):
+    if (MsgType == 'CLICK') and (EventKey == 'story'):
         pub = get_pub(pub_id)
         reply_dict = {
             "ToUserName": FromUserName,
