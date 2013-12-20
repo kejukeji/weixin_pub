@@ -32,6 +32,7 @@ def weixin(pub_id):
             "Content": Content
         }
         reply = web_chat.reply("t", reply_dict)
+        print reply
         response = make_response(reply)
         response.content_type = 'application/xml'
         return response
