@@ -55,3 +55,7 @@ class Pub(Base, InitUpdate):
 
     def __repr__(self):
         return '<Pub(name: %s)>' % self.name
+
+    def picture_url(self):
+        """返回图片的url，相对路径"""
+        return str(self.rel_path) + '/' + str(self.pic_name)

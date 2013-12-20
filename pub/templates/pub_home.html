@@ -9,28 +9,23 @@
 </head>
 <body>
 <div id="header">
-    <img src="../static/img/girl.jpg">
+    <img src="{{ pub.picture_url() }}">
 </div>
 <div class="block">
-    <div class="title">猫吧客</div>
+    <div class="title">{{ pub.name }}</div>
     <hr>
-    <p>
-        对，我就是猫吧客！
-        <br>
-        那一夜，猫吧客来袭。
-        <br>
-        后来，猫吧客又来袭。
-        <br>
-        今天，又来袭。
-        <br>
-        复读机模式 ...
-    </p>
+    <p>{{ pub.intro }}</p>
 </div>
 <div class="block">
     <div class="title">联系方式</div>
     <hr>
-    <p>地址：我在中国大陆的某个地方</p>
-    <p>电话：110 - 120119</p>
+    <p>地址：{{ pub.address }}</p>
+    <p>电话：{{ pub.tel }}</p>
+</div>
+<div class="block">
+    <div class="title">更多</div>
+    <hr>
+    <p>这里是更多的介绍，比如什么和什么啊</p>
 </div>
 <div id="footer"></div>
 </body>
