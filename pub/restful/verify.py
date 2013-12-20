@@ -27,7 +27,7 @@ def weixin(pub_id):
 
         if MsgType == "event":
             print "-----------line 29 verify.py"
-            return response_event(MsgType, xml_recv, web_chat, pub_id)
+            return response_event(xml_recv, web_chat, pub_id)
         if MsgType == "text":
             return response_text(xml_recv, web_chat)
 
@@ -44,12 +44,13 @@ def response_text(xml_recv, web_chat):
     return response(web_chat, reply_dict, "text")
 
 
-def response_event(MsgType, xml_recv, web_chat, pub_id):
+def response_event(xml_recv, web_chat, pub_id):
+    Event = xml_recv.find("Event").text
     EventKey = xml_recv.find("EventKey").text
     ToUserName = xml_recv.find("ToUserName").text
     FromUserName = xml_recv.find("FromUserName").text
 
-    if (MsgType == 'CLICK') and (EventKey == 'story'):
+    if (Event == 'CLICK') and (EventKey == 'story'):
         pub = get_pub(pub_id)
         reply_dict = {
             "ToUserName": FromUserName,
