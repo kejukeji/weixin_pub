@@ -26,12 +26,24 @@ def weixin(pub_id):
         FromUserName = xml_recv.find("FromUserName").text
         Content = xml_recv.find("Content").text
 
+        reply_test = "<xml>" \
+                     "<ToUserName><![CDATA[%s]]></ToUserName>" \
+                     "<FromUserName><![CDATA[%s]]></FromUserName>" \
+                     "<CreateTime>%s</CreateTime>" \
+                     "<MsgType><![CDATA[text]]></MsgType>" \
+                     "<Content><![CDATA[%s]]></Content>" \
+                     "<FuncFlag>0</FuncFlag>" \
+                     "</xml>"
+
+        print(reply_test % (FromUserName, ToUserName, str(int(time.time())), Content))
+
         reply_dict = {
             "ToUserName": FromUserName,
             "FromUserName": ToUserName,
             "Content": Content
         }
         reply = web_chat.reply("t", reply_dict)
+        print reply
         response = make_response(reply)
         response.content_type = 'application/xml'
         return response

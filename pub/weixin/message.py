@@ -9,7 +9,6 @@ TEXT = """
 <CreateTime>$CreateTime$</CreateTime>
 <MsgType>![CDATA[text]]</MsgType>
 <Content>![CDATA[$Content$]]</Content>
-<FuncFlag>0</FuncFlag>
 </xml>
 """
 
