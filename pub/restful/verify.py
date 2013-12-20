@@ -61,6 +61,11 @@ def response_event(MsgType, xml_recv, web_chat, pub_id):
             }]
         }
 
+        print "------------------------------------"
+        print reply_dict
+        print web_chat.reply("news", reply_dict)
+        print "------------------------------------"
+
         return response(web_chat, reply_dict, "news")
 
 
