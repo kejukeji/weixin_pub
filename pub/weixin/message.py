@@ -57,6 +57,7 @@ def msg_news(msg_dict):
     msg_dict["CreateTime"] = str(int(time.time()))
     xml_string = NEWS_HEAD
     for k in msg_dict:
+        print k  # test
         xml_string = xml_string.replace('$'+k+'$', msg_dict[k])
 
     for item in msg_dict["item"]:
