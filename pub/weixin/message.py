@@ -58,7 +58,7 @@ def msg_news(msg_dict):
     xml_string = NEWS_HEAD
     for k in msg_dict:
         print k  # test
-        xml_string = xml_string.replace('$'+k+'$', msg_dict[k])
+        xml_string = xml_string.replace('$'+k+'$', str(msg_dict[k]))
 
     for item in msg_dict["item"]:
         xml_string += msg(item, NEWS_ITEM)
