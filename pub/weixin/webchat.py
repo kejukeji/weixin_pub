@@ -3,6 +3,7 @@
 import hashlib
 import urllib2
 import json
+from .message import msg_format
 
 MENU_STRING = """
 {
@@ -84,3 +85,7 @@ class WebChat(object):
         """返回创建菜单的url"""
         access_token = self.get_access_token()
         return "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + str(access_token)
+
+    @staticmethod
+    def reply(msg_type, msg_dict):
+        return msg_format(msg_type, msg_dict)
