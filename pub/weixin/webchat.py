@@ -12,9 +12,9 @@ MENU_STRING = """
            "name": "品牌主页",
            "sub_button": [
                {
-                   "type": "view",
+                   "type": "click",
                    "name": "品牌故事",
-                   "url": "$url$"
+                   "key": "story"
                },
                {
                    "type": "click",

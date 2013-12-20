@@ -4,10 +4,10 @@
 
 from flask import request, make_response
 from xml.etree import ElementTree as ET
-from pub.weixin.verify import validate
 from .tools import get_token, parse_request
-import time
-from ..weixin.webchat import MENU_STRING, WebChat
+from ..weixin.webchat import WebChat
+from .tools import get_pub
+from ..setting import BASE_URL
 
 
 def weixin(pub_id):
@@ -22,16 +22,54 @@ def weixin(pub_id):
     if request.method == "POST":
         # 这里需要验证
         xml_recv = ET.fromstring(request.data)
-        ToUserName = xml_recv.find("ToUserName").text
-        FromUserName = xml_recv.find("FromUserName").text
-        Content = xml_recv.find("Content").text
+        MsgType = xml_recv.find("MsgType").text
 
+        if MsgType == "event":
+            return response_event(MsgType, xml_recv, web_chat, pub_id)
+        if MsgType == "text":
+            return response_text(xml_recv, web_chat)
+
+
+def response_text(xml_recv, web_chat):
+    ToUserName = xml_recv.find("ToUserName").text
+    FromUserName = xml_recv.find("FromUserName").text
+    Content = xml_recv.find("Content").text
+    reply_dict = {
+        "ToUserName": FromUserName,
+        "FromUserName": ToUserName,
+        "Content": Content
+    }
+    return response(web_chat, reply_dict, "text")
+
+
+def response_event(MsgType, xml_recv, web_chat, pub_id):
+    EventKey = xml_recv.find("EventKey").text
+    ToUserName = xml_recv.find("ToUserName").text
+    FromUserName = xml_recv.find("FromUserName").text
+
+    if (MsgType == 'click') and (EventKey == 'story'):
+        pub = get_pub(pub_id)
         reply_dict = {
             "ToUserName": FromUserName,
             "FromUserName": ToUserName,
-            "Content": Content
+            "ArticleCount": 1,
+            "item": [{
+                "Title": str(pub.name),
+                "Description": str(pub.intro),
+                "PicUrl": BASE_URL+pub.picture_url(),
+                "Url": url(pub_id)
+            }]
         }
-        reply = web_chat.reply("t", reply_dict)
-        response = make_response(reply)
-        response.content_type = 'application/xml'
-        return response
+
+        return response(web_chat, reply_dict, "news")
+
+
+def response(web_chat, reply_dict, reply_type):
+    reply = web_chat.reply(reply_type, reply_dict)
+    reply_response = make_response(reply)
+    reply_response.content_type = 'application/xml'
+    return reply_response
+
+
+def url(pub_id):
+    return BASE_URL+"/pub/"+str(pub_id)
