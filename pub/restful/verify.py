@@ -27,12 +27,11 @@ def weixin(pub_id):
         Content = xml_recv.find("Content").text
 
         reply_dict = {
-            "ToUserName": ToUserName,
-            "FromUserName": FromUserName,
+            "ToUserName": FromUserName,
+            "FromUserName": ToUserName,
             "Content": Content
         }
         reply = web_chat.reply("t", reply_dict)
-        print reply
         response = make_response(reply)
         response.content_type = 'application/xml'
         return response
