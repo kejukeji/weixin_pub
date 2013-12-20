@@ -21,10 +21,12 @@ def weixin(pub_id):
 
     if request.method == "POST":
         # 这里需要验证
+        print "---------line 24 verify.py"
         xml_recv = ET.fromstring(request.data)
         MsgType = xml_recv.find("MsgType").text
 
         if MsgType == "event":
+            print "-----------line 29 verify.py"
             return response_event(MsgType, xml_recv, web_chat, pub_id)
         if MsgType == "text":
             return response_text(xml_recv, web_chat)
