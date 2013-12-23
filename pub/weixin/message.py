@@ -46,6 +46,7 @@ def msg_format(msg_type, msg_dict):
 
 
 def msg(msg_dict, xml_string):
+    """返回文字消息的xml"""
     msg_dict["CreateTime"] = str(int(time.time()))
     for k in msg_dict:
         xml_string = xml_string.replace('$'+k+'$', msg_dict[k])
