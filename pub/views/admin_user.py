@@ -11,6 +11,10 @@ from flask.ext.admin.base import expose
 from sqlalchemy.orm import joinedload
 from flask.ext.admin.contrib.sqla import tools
 from flask.ext import login
+from flask import request, url_for, redirect
+from flask.ext.admin.form import get_form_opts
+from flask.ext.admin.helpers import validate_form_on_submit
+from flask.ext.admin.model.helpers import get_mdict_item_or_list
 
 from ..models.admin_user import AdminUser
 from ..models.user import User
@@ -298,12 +302,38 @@ class UserView(ModelView):
     can_create = False
     can_delete = True
     can_edit = True
+    column_labels = {
+        "id": u'卡号',
+        "mobile": u'手机',
+        "sign_up_date": u'注册时间',
+        "open_id": u'微信',
+        "card_date": u'注册时间',
+        "card_money": u'金额',
+        "card_credit": u'积分',
+        "card_status": u'状态',
+        "name": u'姓名'
+    }
+    column_display_pk = True
+    column_list = ("id", "mobile", "card_status", "card_money", "card_credit", "name")
+    column_choices = dict(
+        card_status=[(0, u'正常'), (1, u'冻结')]
+    )
+    form_choices = dict(
+        card_status=[('0', u'正常'), ('1', u'冻结')]
+    )
+    column_searchable_list = ('mobile', 'name')
 
     def __init__(self, db, **kwargs):
         ModelView.__init__(self, User, db, **kwargs)
 
     def is_accessible(self):
         return login.current_user.is_normal_manageruser()
+
+    def scaffold_form(self):
+        """改写form"""
+        form_class = super(UserView, self).scaffold_form()
+        delete_attrs(form_class, ('sign_up_date', 'pub', 'open_id', 'card_date'))
+        return form_class
 
     def get_list(self, page, sort_column, sort_desc, search, filters, execute=True, pub_id=None):
         """
@@ -493,6 +523,44 @@ class UserView(ModelView):
                                # Actions
                                actions=actions,
                                actions_confirmation=actions_confirmation)
+
+    @expose('/edit/', methods=('GET', 'POST'))
+    def edit_view(self):
+        """
+            Edit model view
+        """
+        return_url = request.args.get('url') or url_for('.index_view')
+
+        if not self.can_edit:
+            return redirect(return_url)
+
+        id = get_mdict_item_or_list(request.args, 'id')
+        if id is None:
+            return redirect(return_url)
+
+        model = self.get_one(id)
+
+        if model is None:
+            return redirect(return_url)
+
+        model.card_status = ((model.card_status or 0) and 1)  # 使用1与0
+
+        form = self.edit_form(obj=model)
+
+        if validate_form_on_submit(form):
+            if self.update_model(form, model):
+                if '_continue_editing' in request.form:
+                    flash(gettext('Model was successfully saved.'))
+                    return redirect(request.full_path)
+                else:
+                    return redirect(return_url)
+
+        return self.render(self.edit_template,
+                           model=model,
+                           form=form,
+                           form_opts=get_form_opts(self),
+                           form_rules=self._form_edit_rules,
+                           return_url=return_url)
 
     def get_pub_id(self):
         try:

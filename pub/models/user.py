@@ -5,7 +5,6 @@
 from sqlalchemy import (Column, Integer, String, DATETIME, ForeignKey, Boolean)
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.mysql import DOUBLE
-import time
 
 from .database import Base
 from .base_class import InitUpdate
