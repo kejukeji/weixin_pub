@@ -2,7 +2,8 @@
 
 from flask import flash
 from ..models.pub import Pub
-from .webchat import MENU_STRING, WebChat
+from .webchat import WebChat
+from .cons_string import MENU_STRING
 
 
 def create_menu(pub_id):

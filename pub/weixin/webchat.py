@@ -5,48 +5,6 @@ import urllib2
 import json
 from .message import msg_format
 
-MENU_STRING = """
-{
-   "button": [
-       {
-           "name": "品牌主页",
-           "sub_button": [
-               {
-                   "type": "click",
-                   "name": "品牌故事",
-                   "key": "story"
-               },
-               {
-                   "type": "click",
-                   "name": "优惠活动",
-                   "key": "activity"
-               }
-           ]
-       },
-       {
-           "name": "会员优惠",
-           "sub_button": [
-               {
-                   "type": "click",
-                   "name": "成为粉丝会员",
-                   "key": "member"
-               },
-               {
-                   "type": "click",
-                   "name": "我的会员优惠",
-                   "key": "discount"
-               }
-           ]
-       },
-       {
-           "type": "click",
-           "name": "每日抽奖",
-           "key": "daily"
-       }
-   ]
-}
-"""
-
 
 class WebChat(object):
     """微信类"""
