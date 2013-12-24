@@ -10,7 +10,8 @@ from .tools import get_pub
 from ..setting import BASE_URL
 from ..models.user import User
 from ..weixin.cons_string import (BIND_ERROR_FORMAT, ALREADY_BIND, BIND_SUCCESS,
-                                  NOT_BIND, CHANGE_ERROR_FORMAT, CHANGE_SUCCESS, CHANGE_NONE)
+                                  NOT_BIND, CHANGE_ERROR_FORMAT, CHANGE_SUCCESS, CHANGE_NONE,
+                                  ALREADY_EXIST)
 from ..models import db
 
 
@@ -78,7 +79,7 @@ def response_event(xml_recv, web_chat, pub_id):
 
     if (Event == 'CLICK') and (EventKey == 'member'):
         old_mobile = already_bind(FromUserName, pub_id)
-        if old_mobile:
+        if old_mobile != "None":
             message = BIND_SUCCESS
         else:
             message = NOT_BIND
@@ -86,7 +87,7 @@ def response_event(xml_recv, web_chat, pub_id):
         reply_dict = {
             "ToUserName": FromUserName,
             "FromUserName": ToUserName,
-            "Content": message.replace('MOBILE', str(old_mobile))
+            "Content": message.replace('MOBILE', old_mobile)
         }
         return response(web_chat, reply_dict, "text")
 
@@ -134,13 +135,17 @@ def response_member_text(xml_recv, web_chat, pub_id, input_type):
         return response(web_chat, reply_dict, "text")
 
     old_mobile = already_bind(FromUserName, pub_id)
+    repeat = User.query.filter(User.mobile == mobile).count()
 
-    if old_mobile:  # 判断是不是已经绑定了其他的手机
+    if old_mobile != "None":  # 如果已经绑定过手机号
         if input_type == "jia":
             message = ALREADY_BIND.replace('MOBILE', old_mobile)
         else:
-            change_mobile(FromUserName, pub_id, mobile)
-            message = CHANGE_SUCCESS.replace('MOBILE', mobile)
+            if (mobile == old_mobile) or (not repeat):
+                change_mobile(FromUserName, pub_id, mobile)
+                message = CHANGE_SUCCESS.replace('MOBILE', mobile)
+            else:
+                message = ALREADY_EXIST.replace('MOBILE', mobile)
 
         reply_dict = {
             "ToUserName": FromUserName,
@@ -148,12 +153,15 @@ def response_member_text(xml_recv, web_chat, pub_id, input_type):
             "Content": message
         }
         return response(web_chat, reply_dict, "text")
-    else:  # 绑定酒吧会员
+    else:  # 如果没有绑定过
         if input_type == 'jia':
-            user = User(mobile=mobile, pub_id=pub_id, open_id=FromUserName)
-            db.add(user)
-            db.commit()
-            message = BIND_SUCCESS.replace('MOBILE', mobile)
+            if not repeat:
+                user = User(mobile=mobile, pub_id=pub_id, open_id=FromUserName)
+                db.add(user)
+                db.commit()
+                message = BIND_SUCCESS.replace('MOBILE', mobile)
+            else:
+                message = ALREADY_EXIST.replace('MOBILE', mobile)
         else:
             message = CHANGE_NONE
 
@@ -170,6 +178,7 @@ def already_bind(open_id, pub_id):
     user = User.query.filter(User.open_id == open_id, User.pub_id == pub_id).first()
     if user:
         return str(user.mobile)
+    return str(None)
 
 
 def change_mobile(open_id, pub_id, mobile):
