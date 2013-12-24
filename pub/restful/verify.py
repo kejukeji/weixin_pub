@@ -9,7 +9,8 @@ from ..weixin.webchat import WebChat
 from .tools import get_pub
 from ..setting import BASE_URL
 from ..models.user import User
-from ..weixin.cons_string import BIND_ERROR_FORMAT, ALREADY_BIND, BIND_SUCCESS, NOT_BIND
+from ..weixin.cons_string import (BIND_ERROR_FORMAT, ALREADY_BIND, BIND_SUCCESS,
+                                  NOT_BIND, CHANGE_ERROR_FORMAT, CHANGE_SUCCESS, CHANGE_NONE)
 from ..models import db
 
 
@@ -38,8 +39,8 @@ def response_text(xml_recv, web_chat, pub_id):
     Content = xml_recv.find("Content").text
     input_type = get_type(Content)
 
-    if input_type == "jia":
-        return response_jia_text(xml_recv, web_chat, pub_id)
+    if input_type in ('jia', 'gai'):
+        return response_member_text(xml_recv, web_chat, pub_id, input_type)
 
     # 下面的句子是鹦鹉学舌，后期改过来
     ToUserName = xml_recv.find("ToUserName").text
@@ -113,39 +114,53 @@ def get_type(Content):
         return "gai"
 
 
-def response_jia_text(xml_recv, web_chat, pub_id):
-    """如果用户输入jia手机号码，这里进行判断"""
+def response_member_text(xml_recv, web_chat, pub_id, input_type):
+    """如果用户输入jia或者是gai手机号码，这里进行判断"""
     Content = xml_recv.find("Content").text
     ToUserName = xml_recv.find("ToUserName").text
     FromUserName = xml_recv.find("FromUserName").text
     mobile = Content[3:]
 
     if not mobile.isdigit():  # 判断输入的格式是否正确
+        if input_type == "jia":
+            message = BIND_ERROR_FORMAT
+        else:
+            message = CHANGE_ERROR_FORMAT
         reply_dict = {
             "ToUserName": FromUserName,
             "FromUserName": ToUserName,
-            "Content": BIND_ERROR_FORMAT
+            "Content": message
         }
         return response(web_chat, reply_dict, "text")
 
     old_mobile = already_bind(FromUserName, pub_id)
 
     if old_mobile:  # 判断是不是已经绑定了其他的手机
-        reply_dict = {
-            "ToUserName": FromUserName,
-            "FromUserName": ToUserName,
-            "Content": ALREADY_BIND.replace('MOBILE', old_mobile)
-        }
-        return response(web_chat, reply_dict, "text")
-    else:  # 绑定酒吧会员
-        user = User(mobile=mobile, pub_id=pub_id, open_id=FromUserName)
-        db.add(user)
-        db.commit()
+        if input_type == "jia":
+            message = ALREADY_BIND.replace('MOBILE', old_mobile)
+        else:
+            change_mobile(FromUserName, pub_id, mobile)
+            message = CHANGE_SUCCESS.replace('MOBILE', mobile)
 
         reply_dict = {
             "ToUserName": FromUserName,
             "FromUserName": ToUserName,
-            "Content": BIND_SUCCESS.replace('MOBILE', mobile)
+            "Content": message
+        }
+        return response(web_chat, reply_dict, "text")
+    else:  # 绑定酒吧会员
+        if input_type == 'jia':
+            user = User(mobile=mobile, pub_id=pub_id, open_id=FromUserName)
+            db.add(user)
+            db.commit()
+            message = BIND_SUCCESS.replace('MOBILE', mobile)
+        else:
+            message = CHANGE_NONE
+
+        reply_dict = {
+            "ToUserName": FromUserName,
+            "FromUserName": ToUserName,
+            "Content": message
         }
         return response(web_chat, reply_dict, "text")
 
@@ -155,3 +170,9 @@ def already_bind(open_id, pub_id):
     user = User.query.filter(User.open_id == open_id, User.pub_id == pub_id).first()
     if user:
         return str(user.mobile)
+
+
+def change_mobile(open_id, pub_id, mobile):
+    user = User.query.filter(User.open_id == open_id, User.pub_id == pub_id).first()
+    user.mobile = mobile
+    db.commit()

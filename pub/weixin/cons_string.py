@@ -46,5 +46,8 @@ MENU_STRING = """
 
 ALREADY_BIND = "您之前已经是酒吧会员。绑定的号码为：MOBILE。如果需要修改绑定的手机号码，输入 gai手机号，比如 gai1872191xx24 （本功能还在开发）"
 BIND_ERROR_FORMAT = "成为酒吧会员，请输入正确的格式，比如 jia1872191xx24"
+CHANGE_ERROR_FORMAT = "修改绑定手机号，请输入正确的格式，比如 gai1872191xx24"
 NOT_BIND = "您还不是酒吧会员，输入 jia手机号 进行微信绑定，比如 jia1872191xx24"
 BIND_SUCCESS = "您已经是酒吧会员了，微信绑定的手机号为：MOBILE。感谢您的加入！"
+CHANGE_SUCCESS = "您成功修改了手机号，新绑定的手机号为：MOBILE。感谢您的加入！"
+CHANGE_NONE = "您还未成为会员，成为酒吧会员，请输入正确的格式，比如 jia1872191xx24"
