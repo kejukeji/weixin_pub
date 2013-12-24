@@ -44,10 +44,10 @@ class SuperUserView(ModelView):
     def create_model(self, form):
         try:
             if not bool(str(form.password.data)):
-                flash('密码不能为空', 'error')
+                flash(u'密码不能为空', 'error')
                 return False
             if not self._valid_form(form):
-                flash('用户名重复', 'error')
+                flash(u'用户名重复', 'error')
                 return False
             model = self.model(**form_to_dict(form))
             self.session.add(model)
@@ -65,7 +65,7 @@ class SuperUserView(ModelView):
     def update_model(self, form, model):
         try:
             if not self._valid_form(form, model=model):
-                flash('用户名重复', 'error')
+                flash(u'用户名重复', 'error')
                 return False
             model.update(**form_to_dict(form))
             self.session.commit()
@@ -347,7 +347,7 @@ class UserView(ModelView):
         count_query = self.get_count_query()
 
         if pub_id is None:
-            flash("系统错误，没有查询到pub_id", 'error')
+            flash(u"系统错误，没有查询到pub_id", 'error')
             raise ValueError
         else:
             query = query.filter(User.pub_id == pub_id)

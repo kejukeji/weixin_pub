@@ -16,7 +16,7 @@ def create_menu(pub_id):
     try:
         web_chat.create_menu(menu_string)
     except:
-        flash("创建微信菜单失败，由于网速的问题会有偶尔的失败")
+        flash(u"创建微信菜单失败，由于网速的问题会有偶尔的失败")
 
 
 def render_string(pub_id, menu_string):

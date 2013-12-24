@@ -81,10 +81,11 @@ def response_event(xml_recv, web_chat, pub_id):
             message = BIND_SUCCESS
         else:
             message = NOT_BIND
+
         reply_dict = {
             "ToUserName": FromUserName,
             "FromUserName": ToUserName,
-            "Content": message.replace('MOBILE', old_mobile)
+            "Content": message.replace('MOBILE', str(old_mobile))
         }
         return response(web_chat, reply_dict, "text")
 

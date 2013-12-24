@@ -20,10 +20,10 @@ class LoginForm(form.Form):
     def validate_user_name(self, field):
         user = self.get_user()
         if not user:
-            raise validators.ValidationError('昵称不存在')
+            raise validators.ValidationError(u'昵称不存在')
 
         if not user.check_password(self.password.data):
-            raise validators.ValidationError('密码错误')
+            raise validators.ValidationError(u'密码错误')
 
     def get_user(self):
         user = AdminUser.query.filter(AdminUser.name == self.user_name.data).first()

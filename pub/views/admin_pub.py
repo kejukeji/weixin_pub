@@ -84,7 +84,7 @@ class PubView(ModelView):
         try:
             form_dict = form_to_dict(form)
             if not self._valid_form(form_dict):
-                flash('用户名重复了，换一个呗', 'error')
+                flash(u'用户名重复了，换一个呗', 'error')
                 return False
 
             pub = self._get_pub(form_dict)
@@ -162,7 +162,7 @@ class PubView(ModelView):
 
         user = AdminUser.query.filter(AdminUser.pub_id == id).filter(AdminUser.admin == '111').first()
         if user is None:
-            flash('这个酒吧还没有管理员哦')
+            flash(u'这个酒吧还没有管理员哦')
             model.user = None
             model.password = None
         else:
@@ -338,7 +338,7 @@ class SinglePubView(PubView):
         count_query = self.get_count_query()
 
         if pub_id is None:
-            flash("系统错误，没有查询到pub_id", 'error')
+            flash(u"系统错误，没有查询到pub_id", 'error')
             raise ValueError
         else:
             query = query.filter(Pub.id == pub_id)

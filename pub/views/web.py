@@ -10,4 +10,4 @@ def pub_home(pub_id):
     if pub:
         return render_template('pub_home.html', pub=pub)
 
-    return "没有查找到相关酒吧"
+    return u"没有查找到相关酒吧"
