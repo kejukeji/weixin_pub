@@ -13,6 +13,9 @@ PICTURE_ALLOWED_EXTENSION = ('png', 'jpg', 'jpeg')
 # 酒吧图片
 PUB_PICTURE_BASE_PATH = "/Users/X/Dropbox/Code/weixin_pub/pub"
 PUB_PICTURE_REL_PATH = "/static/system/pub_picture"
+# 优惠券图片
+TICKET_PICTURE_BASE_PATH = "/Users/X/Dropbox/Code/weixin_pub/pub"
+TICKET_PICTURE_REL_PATH = "/static/system/ticket_picture"
 
 # 基本的url
 BASE_URL = "http://weixin.kejukeji.com"
