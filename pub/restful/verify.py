@@ -11,8 +11,10 @@ from ..setting import BASE_URL
 from ..models.user import User
 from ..weixin.cons_string import (BIND_ERROR_FORMAT, ALREADY_BIND, BIND_SUCCESS,
                                   NOT_BIND, CHANGE_ERROR_FORMAT, CHANGE_SUCCESS, CHANGE_NONE,
-                                  ALREADY_EXIST)
+                                  ALREADY_EXIST, NO_ACTIVITY)
 from ..models import db
+from ..models.ticket import Ticket, UserTicket
+import datetime
 
 
 def weixin(pub_id):
@@ -90,6 +92,11 @@ def response_event(xml_recv, web_chat, pub_id):
             "Content": message.replace('MOBILE', old_mobile)
         }
         return response(web_chat, reply_dict, "text")
+
+    if (Event == 'CLICK') and (EventKey == 'activity'):
+        pub = get_pub(pub_id)
+        reply_dict, reply_type = activity_reply(pub, xml_recv)
+        return response(web_chat, reply_dict, reply_type)
 
 
 def response(web_chat, reply_dict, reply_type):
@@ -185,3 +192,52 @@ def change_mobile(open_id, pub_id, mobile):
     user = User.query.filter(User.open_id == open_id, User.pub_id == pub_id).first()
     user.mobile = mobile
     db.commit()
+
+
+def activity_reply(pub, xml_recv):
+    """活动（优惠券）的回答列表"""
+
+    ToUserName = xml_recv.find("ToUserName").text
+    FromUserName = xml_recv.find("FromUserName").text
+
+    tickets_list = get_tickets_list(pub.id)
+    reply_dict = {
+        "ToUserName": FromUserName,
+        "FromUserName": ToUserName,
+        "ArticleCount": len(tickets_list),
+        "item": []
+    }
+    reply_type = "news"
+    for ticket in tickets_list:
+        item = {
+            "Title": str(ticket.title),
+            "Description": str(ticket.intro),
+            "PicUrl": BASE_URL+ticket.picture_url(),
+            "Url": ticket_url(ticket.id, FromUserName)
+        }
+        reply_dict["item"].append(item)
+
+    if not reply_dict["item"]:  # 如果消息为空，显示没有活动
+        reply_dict = {
+            "ToUserName": FromUserName,
+            "FromUserName": ToUserName,
+            "Content": NO_ACTIVITY
+        }
+        reply_type = "text"
+
+    return reply_dict, reply_type
+
+
+def get_tickets_list(pub_id):
+    """返回优惠券列表"""
+    return Ticket.query.filter(Ticket.pub_id == pub_id, Ticket.status == 1,
+                               Ticket.stop_time >= datetime.datetime.now()).all()
+
+
+def valid_user(pub_id, user):
+    """验证用户是否为酒吧的会员"""
+    return bool(User.query.filter(User.pub_id == pub_id, User.open_id == user).first())
+
+
+def ticket_url(ticket_id, open_id):
+    return "http://www.baidu.com"

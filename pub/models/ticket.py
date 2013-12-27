@@ -23,6 +23,7 @@ class Ticket(Base, InitUpdate):
     number 优惠券已经领取的人数
     max_number 限量领取的人数 - 如果为0，不限量
     pub_id 优惠券隶属酒吧
+    repeat 是否可以重复领取 0不能 1可以
     """
 
     __tablename__ = 'ticket'
@@ -38,6 +39,7 @@ class Ticket(Base, InitUpdate):
     start_time = Column(DATETIME, nullable=False)
     stop_time = Column(DATETIME, nullable=False)
     status = Column(Boolean, nullable=False)
+    repeat = Column(Boolean, nullable=False, default=0, server_default='0')
     base_path = Column(String(128), nullable=True)
     rel_path = Column(String(128), nullable=True)
     pic_name = Column(String(128), nullable=True)
@@ -48,11 +50,15 @@ class Ticket(Base, InitUpdate):
 
     def __init__(self, **kwargs):
         self.init_value(('title', 'intro', 'start_time', 'stop_time',
-                         'status', 'number', 'max_number', 'pub_id'), kwargs)
+                         'status', 'number', 'max_number', 'pub_id', 'repeat'), kwargs)
 
     def update(self, **kwargs):
         self.update_value(('title', 'intro', 'start_time', 'stop_time',
-                           'status', 'number', 'max_number'), kwargs)
+                           'status', 'number', 'max_number', 'repeat'), kwargs)
+
+    def picture_url(self):
+        """返回图片的url，相对路径"""
+        return str(self.rel_path) + '/' + str(self.pic_name)
 
 
 class UserTicket(Base, InitUpdate):

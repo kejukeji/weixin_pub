@@ -11,3 +11,7 @@ def pub_home(pub_id):
         return render_template('pub_home.html', pub=pub)
 
     return u"没有查找到相关酒吧"
+
+
+def ticket_web():
+    pass

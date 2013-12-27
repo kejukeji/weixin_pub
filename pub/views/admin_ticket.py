@@ -10,23 +10,18 @@ from flask.ext.admin.babel import gettext
 from flask.ext.admin.model.helpers import get_mdict_item_or_list
 from flask.ext.admin.helpers import validate_form_on_submit
 from flask.ext.admin.form import get_form_opts
-from wtforms.fields import TextField, FileField
-from wtforms import validators
+from wtforms.fields import FileField
 from flask.ext import login
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 from flask.ext.admin.contrib.sqla import tools
 
-from ..models.pub import Pub
 from ..models.ticket import Ticket, UserTicket
-from ..models.admin_user import AdminUser
 from ..utils.others import form_to_dict
 from ..utils.ex_file import time_file_name, allowed_file_extension
 from ..utils.ex_object import delete_attrs
-from ..weixin.menu import create_menu
 from werkzeug import secure_filename
 from ..setting import PICTURE_ALLOWED_EXTENSION, TICKET_PICTURE_BASE_PATH, TICKET_PICTURE_REL_PATH
-import Image
 
 log = logging.getLogger("flask-admin.sqla")
 
@@ -48,13 +43,16 @@ class TicketView(ModelView):
         'status': u'状态',
         'number': u'已领取人数',
         'max_number': u'限制领取人数',
-        'pub.name': u'酒吧'
+        'pub.name': u'酒吧',
+        'repeat': u'重复领取'
     }
     column_choices = {
-        'status': [(0, u'下线'), (1, u'上线')]
+        'status': [(0, u'下线'), (1, u'上线')],
+        'repeat': [(0, u'用户消费之后可以继续领取'), (1, u'每个用户限制领取一次')]
     }
     form_choices = {
-        'status': [('0', u'下线'), ('1', u'上线')]
+        'status': [('0', u'下线'), ('1', u'上线')],
+        'repeat': [('0', u'用户消费之后可以继续领取'), ('1', u'每个用户限制领取一次')]
     }
     column_descriptions = {
         'number': u'已经获取了这个优惠券的人数',
@@ -324,6 +322,7 @@ class TicketView(ModelView):
             return redirect(return_url)
 
         model.status = ((model.status or 0) and 1)  # 使用1与0
+        model.repeat = ((model.repeat or 0) and 1)  # 使用1与0
 
         form = self.edit_form(obj=model)
 
