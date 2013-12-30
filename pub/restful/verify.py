@@ -240,4 +240,4 @@ def valid_user(pub_id, user):
 
 
 def ticket_url(ticket_id, open_id):
-    return "http://www.baidu.com"
+    return BASE_URL + "/ticket/" + str(ticket_id) + "?open_id="+str(open_id)

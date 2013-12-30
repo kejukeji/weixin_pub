@@ -34,4 +34,6 @@ app.add_url_rule('/weixin/pub/<int:pub_id>', 'weixin', weixin, methods=('GET', '
 
 # 微信页面
 from .views.web import pub_home
+from .views.web import ticket_home
 app.add_url_rule('/pub/<int:pub_id>', 'pub_home', pub_home, methods=('GET', 'POST'))
+app.add_url_rule('/ticket/<int:ticket_id>', 'ticket_home', ticket_home, methods=('GET', 'POST'))

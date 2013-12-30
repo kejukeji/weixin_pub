@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../static/css/reset.css">
+<link rel="stylesheet" href="../static/css/ticket_home.css">
+<title>{{ ticket.title }}</title>
+</head>
+<body>
+<div id="header">
+    <img src="{{ ticket.picture_url() }}">
+</div>
+<div class="block">
+    <div class="title">{{ ticket.title }}</div>
+    <hr>
+    <p>{{ ticket.intro }}</p>
+</div>
+<div class="block">
+    <div class="title">注意事项</div>
+    <hr>
+    <p>有效时间：</p>
+    <p>{{ ticket.start_time.__str__()[0:10] }} 至 {{ ticket.stop_time.__str__()[0:10] }}</p>
+    <p>领取规则：</p>
+    {% if ticket.repeat.__int__() == 0 %}
+    <p>本优惠券每人限领一次。</p>
+    {% else %}
+    <p>本店促销，优惠券可以多次领取哦。</p>
+    {% endif %}
+</div>
+<div class="block">
+    <div class="title">我的优惠</div>
+    <hr>
+    {% if message['max_number'] %}
+    <p>本优惠券限制领取，目前已经领取{{ message['number'] }}张，限制领取{{ message['max_number'] }}张。</p>
+    {% else %}
+    <p> 已有{{ message['number'] }}人领取了优惠券。 </p>
+    {% endif %}
+
+    {% if not message['register'] %}
+    <p>只有本吧会员才能领取优惠券哦。</p>
+    <a><button class="disable">无法领取</button></a>
+    {% endif %}
+
+    {% if message['register'] and message['already_has'] == 0 %}
+    <p>您可以领取优惠券。</p>
+    <a href={{ url }}><button class="able">马上领取</button></a>
+    {% endif %}
+    {% if message['register'] and message['already_has'] == 1 %}
+    <p>您已经领取了优惠券。</p>
+    <a><button class="disable">已经领取</button></a>
+    {% endif %}
+    {% if message['register'] and message['already_has'] == 2 %}
+    <p>您已经领取了优惠券并且消费，本优惠券无法多次领取。</p>
+    <a><button class="disable">已经领取</button></a>
+    {% endif %}
+    {% if message['register'] and message['already_has'] == 3 %}
+    <p>本优惠券已经抢购一空了！</p>
+    <a><button class="disable">已经领取</button></a>
+    {% endif %}
+
+
+
+</div>
+<div id="footer"></div>
+</body>
+</html>

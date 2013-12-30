@@ -80,3 +80,6 @@ class UserTicket(Base, InitUpdate):
     ticket_id = Column(Integer, ForeignKey(Ticket.id, ondelete='cascade', onupdate='cascade'), nullable=False)
     user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade', onupdate='cascade'), nullable=False)
     status = Column(Boolean, nullable=False, default=0, server_default='0')
+
+    def __init__(self, **kwargs):
+        self.init_value(('user_id', 'ticket_id'), kwargs)
