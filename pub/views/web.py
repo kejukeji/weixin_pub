@@ -23,7 +23,7 @@ def ticket_home(ticket_id):
     user = User.query.filter(User.open_id == open_id, User.pub_id == int(ticket.pub_id)).first()
     add = request.args.get('add', '0')
 
-    if add:
+    if int(add):
         user_ticket = UserTicket.query.filter(UserTicket.ticket_id == ticket_id,
                                               UserTicket.user_id == int(user.id)).first()
         # 如果用户已经领取，但是消费了(没有消费不错处理)
