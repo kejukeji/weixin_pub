@@ -5,6 +5,7 @@ import logging
 
 from flask.ext.admin.contrib.sqla import ModelView
 from flask import flash
+from wtforms.fields import TextField
 from flask.ext.admin.babel import gettext
 from sqlalchemy import or_
 from flask.ext.admin.base import expose
@@ -302,6 +303,7 @@ class UserView(ModelView):
     can_create = False
     can_delete = True
     can_edit = True
+    edit_template = "admin/edit.html"
     column_labels = {
         "id": u'卡号',
         "mobile": u'手机',
@@ -332,6 +334,7 @@ class UserView(ModelView):
     def scaffold_form(self):
         """改写form"""
         form_class = super(UserView, self).scaffold_form()
+        form_class.ticket = TextField(label=u'优惠券管理入口')
         delete_attrs(form_class, ('sign_up_date', 'pub', 'open_id', 'card_date'))
         return form_class
 

@@ -211,14 +211,16 @@ def discount_reply(pub, xml_recv):
     user = User.query.filter(User.open_id == FromUserName, User.pub_id == int(pub.id)).first()
     if user:
         ticket_list = db.query(Ticket).join(UserTicket).filter(UserTicket.status == 0,
-                                                               UserTicket.user_id == int(user.id))
+                                                               UserTicket.user_id == int(user.id),
+                                                               Ticket.stop_time >= datetime.datetime.now())
     else:
         ticket_list = None
 
     if ticket_list:
         message = "您的优惠券信息如下：\n\n"
         for ticket in ticket_list:
-            message += str(ticket.title) + " - " + str(ticket.intro) + "\n\n"
+            message += str(ticket.title) + " - " + str(ticket.intro) + "\n\n" + "有效时间：" + \
+                       str(ticket.start_time) + " - " + str(ticket.start_time) + "\n\n"
     else:
         message = "您目前没有领取优惠券。"
 
