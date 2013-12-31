@@ -194,6 +194,7 @@ def change_mobile(open_id, pub_id, mobile):
     db.commit()
 
 
+def discount_reply(pub, xml_recv):
 def activity_reply(pub, xml_recv):
     """活动（优惠券）的回答列表"""
 
