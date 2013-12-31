@@ -58,6 +58,7 @@ def response_text(xml_recv, web_chat, pub_id):
 
 
 def response_event(xml_recv, web_chat, pub_id):
+    """对事件进行相应"""
     Event = xml_recv.find("Event").text
     EventKey = xml_recv.find("EventKey").text
     ToUserName = xml_recv.find("ToUserName").text
@@ -98,8 +99,14 @@ def response_event(xml_recv, web_chat, pub_id):
         reply_dict, reply_type = activity_reply(pub, xml_recv)
         return response(web_chat, reply_dict, reply_type)
 
+    if (Event == 'CLICK') and (EventKey == 'discount'):
+        pub = get_pub(pub_id)
+        reply_dict, reply_type = discount_reply(pub, xml_recv)
+        return response(web_chat, reply_dict, reply_type)
+
 
 def response(web_chat, reply_dict, reply_type):
+    """通过返回的xml与类型，创建一个回复"""
     reply = web_chat.reply(reply_type, reply_dict)
     reply_response = make_response(reply)
     reply_response.content_type = 'application/xml'
@@ -107,6 +114,7 @@ def response(web_chat, reply_dict, reply_type):
 
 
 def url(pub_id):
+    """返回酒吧的详情web的url"""
     return BASE_URL+"/pub/"+str(pub_id)
 
 
@@ -189,12 +197,38 @@ def already_bind(open_id, pub_id):
 
 
 def change_mobile(open_id, pub_id, mobile):
+    """修改用户的绑定手机"""
     user = User.query.filter(User.open_id == open_id, User.pub_id == pub_id).first()
     user.mobile = mobile
     db.commit()
 
 
 def discount_reply(pub, xml_recv):
+    """返回用户优惠的字典，同时也有中奖的项目"""
+    reply_type = "text"
+    ToUserName = xml_recv.find("ToUserName").text
+    FromUserName = xml_recv.find("FromUserName").text
+    user = User.query.filter(User.open_id == FromUserName, User.pub_id == int(pub.id)).first()
+
+    if user:
+        ticket_list = db.query(Ticket).join(UserTicket).filter(UserTicket.status == 0,
+                                                               UserTicket.user_id == int(user.id))
+
+        message = "您的优惠券信息如下：\n\n"
+        for ticket in ticket_list:
+            message += str(ticket.title) + "\n"
+    else:
+        message = "您目前没有领取优惠券。"
+
+    reply_dict = {
+        "ToUserName": FromUserName,
+        "FromUserName": ToUserName,
+        "Content": message
+    }
+
+    return reply_dict, reply_type
+
+
 def activity_reply(pub, xml_recv):
     """活动（优惠券）的回答列表"""
 
@@ -241,4 +275,5 @@ def valid_user(pub_id, user):
 
 
 def ticket_url(ticket_id, open_id):
+    """返回优惠券的详情页路径"""
     return BASE_URL + "/ticket/" + str(ticket_id) + "?open_id="+str(open_id)
