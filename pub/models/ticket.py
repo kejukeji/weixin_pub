@@ -36,6 +36,7 @@ class Ticket(Base, InitUpdate):
     id = Column(Integer, primary_key=True)
     title = Column(String(32), nullable=False)
     intro = Column(String(256), nullable=False)
+    create_time = Column(DATETIME, nullable=False)
     start_time = Column(DATETIME, nullable=False)
     stop_time = Column(DATETIME, nullable=False)
     status = Column(Boolean, nullable=False)
@@ -51,6 +52,7 @@ class Ticket(Base, InitUpdate):
     def __init__(self, **kwargs):
         self.init_value(('title', 'intro', 'start_time', 'stop_time',
                          'status', 'number', 'max_number', 'pub_id', 'repeat'), kwargs)
+        self.create_time = todayfstr()
 
     def update(self, **kwargs):
         self.update_value(('title', 'intro', 'start_time', 'stop_time',

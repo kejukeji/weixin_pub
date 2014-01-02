@@ -124,9 +124,9 @@ def get_type(Content):
     None 未知类型，不是相关的业务
     """
 
-    if Content.startswith("jia"):
+    if Content[0:3].lower() == 'jia':
         return "jia"
-    if Content.startswith("gai"):
+    if Content[0:3].lower() == 'gai':
         return "gai"
 
 
