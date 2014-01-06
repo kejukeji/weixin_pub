@@ -335,6 +335,7 @@ def gain_gift(pub, xml_recv):
         db.add(UserGiftTime(user_id=user.id, time=datetime.datetime.now()))
     else:
         user_gift_time.time = datetime.datetime.now()
+    db.commit()
 
     if not gift:  # 如果没有礼物
         return False, None
