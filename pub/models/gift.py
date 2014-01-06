@@ -79,3 +79,22 @@ class UserGift(Base, InitUpdate):
 
     def update(self, **kwargs):
         self.update_value(('status',), kwargs)
+
+
+class UserGiftTime(Base, InitUpdate):
+    """用户抽奖时间记录
+    time 抽奖时间
+    """
+    __tablename__ = 'user_gift_time'
+
+    __table_args__ = {
+        'mysql_engine': 'InnoDB',
+        'mysql_charset': 'utf8'
+    }
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade', onupdate='cascade'), nullable=False)
+    time = Column(DATETIME, nullable=False)
+
+    def __init__(self, **kwargs):
+        self.init_value(('user_id', 'time'), kwargs)

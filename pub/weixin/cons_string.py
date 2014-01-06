@@ -53,3 +53,7 @@ CHANGE_SUCCESS = "您成功修改了手机号，新绑定的手机号为：MOBIL
 CHANGE_NONE = "您还未成为会员，成为酒吧会员，请输入正确的格式，比如 jia1872191xx24"
 ALREADY_EXIST = "手机号MOBILE已经被其他微信号绑定"
 NO_ACTIVITY = "目前没有优惠活动"
+NO_GIFT = "很抱歉，您没有中奖。"
+HAS_GIFT = "恭喜你，中奖了！"
+NOT_USER_GIFT = "抱歉，酒吧会员才能抽奖哦。"
+HAS_ROLL = "一天只能抽奖一次哦。让我们期待美好的明天吧 ~"

@@ -11,10 +11,13 @@ from ..setting import BASE_URL
 from ..models.user import User
 from ..weixin.cons_string import (BIND_ERROR_FORMAT, ALREADY_BIND, BIND_SUCCESS,
                                   NOT_BIND, CHANGE_ERROR_FORMAT, CHANGE_SUCCESS, CHANGE_NONE,
-                                  ALREADY_EXIST, NO_ACTIVITY)
+                                  ALREADY_EXIST, NO_ACTIVITY, NO_GIFT, HAS_GIFT, NOT_USER_GIFT, HAS_ROLL)
 from ..models import db
 from ..models.ticket import Ticket, UserTicket
+from ..models.gift import Gift, UserGift, UserGiftTime
 import datetime
+import time
+import random
 
 
 def weixin(pub_id):
@@ -102,6 +105,11 @@ def response_event(xml_recv, web_chat, pub_id):
     if (Event == 'CLICK') and (EventKey == 'discount'):
         pub = get_pub(pub_id)
         reply_dict, reply_type = discount_reply(pub, xml_recv)
+        return response(web_chat, reply_dict, reply_type)
+
+    if (Event == 'CLICK') and (EventKey == 'daily'):  # 用户抽奖
+        pub = get_pub(pub_id)
+        reply_dict, reply_type = daily_reply(pub, xml_recv)
         return response(web_chat, reply_dict, reply_type)
 
 
@@ -263,6 +271,107 @@ def activity_reply(pub, xml_recv):
             "Content": NO_ACTIVITY
         }
         reply_type = "text"
+
+    return reply_dict, reply_type
+
+
+def daily_reply(pub, xml_recv):
+    """对用户抽奖的回复"""
+    FromUserName = xml_recv.find("FromUserName").text
+    ToUserName = xml_recv.find("ToUserName").text
+
+    if not valid_user(pub.id, FromUserName):  # 验证是不是会员
+        reply_type = "text"
+        reply_dict = {
+            "ToUserName": FromUserName,
+            "FromUserName": ToUserName,
+            "Content": NOT_USER_GIFT
+        }
+        return reply_dict, reply_type
+
+    user = User.query.filter(User.open_id == FromUserName).first()
+    if has_roll(user):  # 如果已经抽奖
+        reply_type = "text"
+        reply_dict = {
+            "ToUserName": FromUserName,
+            "FromUserName": ToUserName,
+            "Content": HAS_ROLL
+        }
+        return reply_dict, reply_type
+
+    result, gift = gain_gift(pub, xml_recv)  # 返回抽奖是否成功，同时更新数据库
+    reply_dict, reply_type = make_daily_reply(result, gift, xml_recv)  # 获取回复
+    return reply_dict, reply_type  # 返回结果
+
+
+def has_roll(user):
+    """如果用户已经抽奖，返回True 否者False"""
+    user_gift_time = UserGiftTime.query.filter(UserGiftTime.user_id == user.id).first()
+    if not user_gift_time:
+        return False
+
+    user_time = time.strptime(str(user_gift_time.time), '%Y-%m-%d %H:%M:%S')
+    start_time_str = str(datetime.datetime.now())[0:10] + " 00:00:00"
+    stop_time_str = str(datetime.datetime.now()+datetime.timedelta(days=1))[0:10] + " 00:00:00"
+    start_time = time.strptime(start_time_str, '%Y-%m-%d %H:%M:%S')
+    stop_time = time.strptime(stop_time_str, '%Y-%m-%d %H:%M:%S')
+
+    if start_time <= user_time <= stop_time:
+        return True
+
+    return False
+
+
+def gain_gift(pub, xml_recv):
+    """判断是否获奖同时更新数据"""
+    FromUserName = xml_recv.find("FromUserName").text
+    user = User.query.filter(User.open_id == FromUserName).first()
+    gift = Gift.query.filter(Gift.pub_id == int(pub.id),
+                             Gift.stop_time >= datetime.datetime.now()).first()
+
+    # 更新抽奖时间
+    user_gift_time = UserGiftTime.query.filter(UserGiftTime.user_id == user.id).first()
+    if not user_gift_time:
+        db.add(UserGiftTime(user_id=user.id, time=datetime.datetime.now()))
+    else:
+        user_gift_time.time = datetime.datetime.now()
+
+    if not gift:  # 如果没有礼物
+        return False, None
+
+    result = True if (random.randint(0, 10000) < 10000 * float(gift.probability)) else False  # 判断是否获奖
+
+    # 更新数据库
+    if result and user:
+        db.add(UserGift(user_id=int(user.id), gift_id=int(gift.id)))
+
+    # 更新奖品相关数据
+    gift.number += 1  # 更新抽奖数据
+    gift.win_number += 1 if result else 0  # 更新中奖数据
+    db.commit()
+
+    return result, gift
+
+
+def make_daily_reply(result, gift, xml_recv):
+    """ 中奖回答的内容与类型 """
+    ToUserName = xml_recv.find("ToUserName").text
+    FromUserName = xml_recv.find("FromUserName").text
+
+    if result is False:
+        reply_type = "text"
+        reply_dict = {
+            "ToUserName": FromUserName,
+            "FromUserName": ToUserName,
+            "Content": NO_GIFT
+        }
+    else:
+        reply_type = "text"
+        reply_dict = {
+            "ToUserName": FromUserName,
+            "FromUserName": ToUserName,
+            "Content": HAS_GIFT + "奖品是：" + str(gift.title) + " - " + str(gift.intro)
+        }
 
     return reply_dict, reply_type
 

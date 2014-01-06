@@ -9,7 +9,7 @@ from pub.models.pub import Pub
 from pub.models.admin_user import AdminUser
 from pub.models.user import User
 from pub.models.ticket import Ticket, UserTicket
-from pub.models.gift import Gift, UserGift
+from pub.models.gift import Gift, UserGift, UserGiftTime
 
 
 if __name__ == '__main__':
