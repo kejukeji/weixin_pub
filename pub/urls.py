@@ -20,6 +20,7 @@ from .views.admin_user import SuperUserView, ManagerUserView, UserView
 from .views.admin_pub import PubView
 from .views.admin_pub import SinglePubView
 from .views.admin_ticket import TicketView, UserTicketView
+from .views.admin_gift import GiftView, UserGiftView
 
 admin.add_view(SuperUserView(db, name=u'管理员', endpoint='superuser', category=u"猫吧客"))
 admin.add_view(ManagerUserView(db, name=u'管理员', endpoint='manageruser', category=u"酒吧客户"))
@@ -28,6 +29,8 @@ admin.add_view(SinglePubView(db, name=u'酒吧管理', endpoint='singlepubview')
 admin.add_view(UserView(db, name=u'会员管理', category=u'会员'))
 admin.add_view(TicketView(db, name=u'优惠券管理'))
 admin.add_view(UserTicketView(db, name=u'会员优惠券', category=u'会员'))
+admin.add_view(GiftView(db, name=u'奖品管理'))
+admin.add_view(UserGiftView(db, name=u'会员奖品', category=u'会员'))
 
 # 微信接口处理路径
 from .restful.verify import weixin

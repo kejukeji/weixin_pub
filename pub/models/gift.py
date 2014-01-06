@@ -7,6 +7,7 @@ from .database import Base
 from .pub import Pub
 from .base_class import InitUpdate
 from ..utils.ex_time import todayfstr
+from .user import User
 
 
 class Gift(Base, InitUpdate):
@@ -49,3 +50,32 @@ class Gift(Base, InitUpdate):
 
     def update(self, **kwargs):
         self.update_value(('title', 'intro', 'start_time', 'stop_time', 'probability'), kwargs)
+
+
+class UserGift(Base, InitUpdate):
+    """
+    id
+    gift_id
+    user_id
+    status 优惠券是否使用 0 没有使用 1 使用
+    """
+
+    __tablename__ = 'user_gift'
+
+    __table_args__ = {
+        'mysql_engine': 'InnoDB',
+        'mysql_charset': 'utf8'
+    }
+
+    id = Column(Integer, primary_key=True)
+    gift_id = Column(Integer, ForeignKey(Gift.id, ondelete='cascade', onupdate='cascade'), nullable=False)
+    gift = relationship(Gift)
+    user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade', onupdate='cascade'), nullable=False)
+    user = relationship(User)
+    status = Column(Boolean, nullable=False, default=0, server_default='0')
+
+    def __init__(self, **kwargs):
+        self.init_value(('user_id', 'gift_id'), kwargs)
+
+    def update(self, **kwargs):
+        self.update_value(('status',), kwargs)

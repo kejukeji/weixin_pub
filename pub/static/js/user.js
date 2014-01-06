@@ -13,7 +13,9 @@ $(document).ready(function() {
     function init() {
         // 添加一个图片上传的按钮，如果是update的话，这个按钮会在后面改变
 		var user_ticket = $.parseHTML("<a href='/admin/userticketview?user_id="+gup('id')+"'>点击进入</a>");
+        var user_gift = $.parseHTML("<a href='/admin/usergiftview?user_id="+gup('id')+"'>点击进入</a>");
 		$("#ticket").replaceWith(user_ticket);
+        $("#gift").replaceWith(user_gift);
     }
     init();
 });

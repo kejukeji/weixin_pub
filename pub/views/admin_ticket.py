@@ -44,7 +44,8 @@ class TicketView(ModelView):
         'number': u'已领取人数',
         'max_number': u'限制领取人数',
         'pub.name': u'酒吧',
-        'repeat': u'重复领取'
+        'repeat': u'重复领取',
+        'create_time': u'创建时间'
     }
     column_choices = {
         'status': [(0, u'下线'), (1, u'上线')],
@@ -59,7 +60,7 @@ class TicketView(ModelView):
         'max_number': u'限制领取优惠券的人数，也就是只有那么多的人能够领取到这个优惠券。如果为0，就是没有限制。'
     }
     column_display_pk = True
-    column_list = ('id', 'title', 'start_time', 'stop_time', 'number', 'max_number', 'status')
+    column_list = ('id', 'create_time', 'title', 'start_time', 'stop_time', 'number', 'max_number', 'status')
 
     def __init__(self, db, **kwargs):
         super(TicketView, self).__init__(Ticket, db, **kwargs)
@@ -67,7 +68,7 @@ class TicketView(ModelView):
     def scaffold_form(self):
         """改写form"""
         form_class = super(TicketView, self).scaffold_form()
-        delete_attrs(form_class, ('base_path', 'rel_path', 'pic_name', 'pub'))
+        delete_attrs(form_class, ('base_path', 'rel_path', 'pic_name', 'pub', 'create_time'))
         form_class.picture = FileField(label=u'优惠券图片', description=u'推荐使用640*288')
 
         return form_class
@@ -372,7 +373,8 @@ class UserTicketView(ModelView):
         'status': [('0', u'未使用'), ('1', u'使用')]
     }
     column_display_pk = True
-    column_list = ('id', 'ticket.title', 'ticket.start_time', 'ticket.stop_time', 'status', 'ticket.intro')
+    column_list = ('id', 'user.mobile', 'ticket.title', 'ticket.start_time',
+                   'ticket.stop_time', 'status', 'ticket.intro')
 
     def __init__(self, db, **kwargs):
         super(UserTicketView, self).__init__(UserTicket, db, **kwargs)
