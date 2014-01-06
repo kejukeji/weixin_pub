@@ -220,7 +220,7 @@ def discount_reply(pub, xml_recv):
     if user:
         ticket_list = db.query(Ticket).join(UserTicket).filter(UserTicket.status == 0,
                                                                UserTicket.user_id == int(user.id),
-                                                               Ticket.stop_time >= datetime.datetime.now())
+                                                               Ticket.stop_time >= datetime.datetime.now()).all()
     else:
         ticket_list = None
 
