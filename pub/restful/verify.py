@@ -76,7 +76,7 @@ def response_event(xml_recv, web_chat, pub_id):
             "item": [{
                 "Title": str(pub.name),
                 "Description": str(pub.intro),
-                "PicUrl": BASE_URL+pub.picture_url(),
+                "PicUrl": pub.picture_url(),
                 "Url": url(pub_id)
             }]
         }
@@ -270,7 +270,7 @@ def activity_reply(pub, xml_recv):
         item = {
             "Title": str(ticket.title),
             "Description": str(ticket.intro),
-            "PicUrl": BASE_URL+ticket.picture_url(),
+            "PicUrl": ticket.picture_url(),
             "Url": ticket_url(ticket.id, FromUserName)
         }
         reply_dict["item"].append(item)
