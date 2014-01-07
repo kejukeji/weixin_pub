@@ -223,7 +223,7 @@ def discount_reply(pub, xml_recv):
                                                                Ticket.stop_time >= datetime.datetime.now()).all()
         gift_list = db.query(Gift).join(UserGift).filter(UserGift.status == 0,
                                                          UserGift.user_id == int(user.id),
-                                                         Gift.stop_time >= datetime.datetime.now())
+                                                         Gift.stop_time >= datetime.datetime.now()).all()
     else:
         ticket_list = None
         gift_list = None
