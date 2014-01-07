@@ -9,7 +9,7 @@ from ..weixin.webchat import WebChat
 from .tools import get_pub
 from ..setting import BASE_URL
 from ..models.user import User
-from ..weixin.cons_string import (BIND_ERROR_FORMAT, ALREADY_BIND, BIND_SUCCESS,
+from ..weixin.cons_string import (BIND_ERROR_FORMAT, ALREADY_BIND, BIND_SUCCESS, NORMAL_REPLY,
                                   NOT_BIND, CHANGE_ERROR_FORMAT, CHANGE_SUCCESS, CHANGE_NONE,
                                   ALREADY_EXIST, NO_ACTIVITY, NO_GIFT, HAS_GIFT, NOT_USER_GIFT, HAS_ROLL)
 from ..models import db
@@ -48,14 +48,14 @@ def response_text(xml_recv, web_chat, pub_id):
     if input_type in ('jia', 'gai'):
         return response_member_text(xml_recv, web_chat, pub_id, input_type)
 
-    # 下面的句子是鹦鹉学舌，后期改过来
+    # 如果输入其他的语句，如何回复呢？
     ToUserName = xml_recv.find("ToUserName").text
     FromUserName = xml_recv.find("FromUserName").text
 
     reply_dict = {
         "ToUserName": FromUserName,
         "FromUserName": ToUserName,
-        "Content": Content
+        "Content": NORMAL_REPLY
     }
     return response(web_chat, reply_dict, "text")
 
@@ -67,7 +67,7 @@ def response_event(xml_recv, web_chat, pub_id):
     ToUserName = xml_recv.find("ToUserName").text
     FromUserName = xml_recv.find("FromUserName").text
 
-    if (Event == 'CLICK') and (EventKey == 'story'):
+    if (Event == 'CLICK') and (EventKey == 'story') or (Event == 'subscribe'):  # subscribe是订阅事件
         pub = get_pub(pub_id)
         reply_dict = {
             "ToUserName": FromUserName,
