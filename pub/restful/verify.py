@@ -223,7 +223,7 @@ def discount_reply(pub, xml_recv):
                                                                Ticket.stop_time >= datetime.datetime.now()).all()
         gift_list = db.query(Gift).join(UserGift).filter(UserGift.status == 0,
                                                          UserGift.user_id == int(user.id),
-                                                         UserGift.stop_time >= datetime.datetime.now())
+                                                         Gift.stop_time >= datetime.datetime.now())
     else:
         ticket_list = None
         gift_list = None
@@ -234,12 +234,12 @@ def discount_reply(pub, xml_recv):
             message += "您的优惠券信息如下：\n\n"
             for ticket in ticket_list:
                 message += str(ticket.title) + " - " + str(ticket.intro) + "\n\n" + "有效时间：" + \
-                           str(ticket.start_time) + " - " + str(ticket.start_time) + "\n\n"
+                           str(ticket.start_time) + " - " + str(ticket.stop_time) + "\n\n"
         if gift_list:
             message += "\n您的获奖信息如下：\n\n"
             for gift in gift_list:
                 message += str(gift.title) + " - " + str(gift.intro) + "\n\n" + "有效时间：" + \
-                           str(gift.start_time) + " - " + str(gift.start_time) + "\n\n"
+                           str(gift.start_time) + " - " + str(gift.stop_time) + "\n\n"
     else:
         message = "您目前没有领取优惠券。"
 
