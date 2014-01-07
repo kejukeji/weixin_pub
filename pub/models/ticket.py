@@ -7,6 +7,7 @@ from .pub import Pub
 from .user import User
 from .base_class import InitUpdate
 from ..utils.ex_time import todayfstr
+from ..setting import BASE_URL
 
 
 class Ticket(Base, InitUpdate):
@@ -60,7 +61,7 @@ class Ticket(Base, InitUpdate):
 
     def picture_url(self):
         """返回图片的url，相对路径"""
-        return str(self.rel_path) + '/' + str(self.pic_name)
+        return BASE_URL + str(self.rel_path) + '/' + str(self.pic_name)
 
 
 class UserTicket(Base, InitUpdate):

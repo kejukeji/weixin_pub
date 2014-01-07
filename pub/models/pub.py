@@ -5,6 +5,7 @@ from sqlalchemy import (Column, Integer, String, DATETIME, Boolean)
 from .database import Base
 from .base_class import InitUpdate
 from ..utils.ex_time import todayfstr
+from ..setting import BASE_URL
 
 
 class Pub(Base, InitUpdate):
@@ -58,4 +59,4 @@ class Pub(Base, InitUpdate):
 
     def picture_url(self):
         """返回图片的url，相对路径"""
-        return str(self.rel_path) + '/' + str(self.pic_name)
+        return BASE_URL + str(self.rel_path) + '/' + str(self.pic_name)

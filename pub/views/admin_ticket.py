@@ -364,7 +364,8 @@ class UserTicketView(ModelView):
         'ticket.stop_time': u'截止时间',
         'ticket.intro': u'介绍',
         'status': u'状态',
-        'ticket.title': u'优惠券'
+        'ticket.title': u'优惠券',
+        'user.mobile': u'手机号'
     }
     column_choices = {
         'status': [(0, u'未使用'), (1, u'使用')]
