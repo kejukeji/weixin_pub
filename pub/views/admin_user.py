@@ -31,7 +31,17 @@ class SuperUserView(ModelView):
     form_choices = dict(
         admin=[('1111', u'猫吧管理员')]
     )
+    column_choices = dict(
+        admin=[('1111', u'猫吧管理员')]
+    )
     pub_user_filter = '1111'  # 过滤用户的标志
+    column_labels = dict(
+        name=u'用户名',
+        admin=u'权限',
+        password=u'密码',
+        sign_up_date=u'注册时间',
+    )
+    column_list = ('name', 'admin', 'sign_up_date')
 
     def __init__(self, db, **kwargs):
         ModelView.__init__(self, AdminUser, db, **kwargs)
@@ -290,6 +300,17 @@ class ManagerUserView(SuperUserView):
     form_choices = dict(
         admin=[('111', u'酒吧管理员')]
     )
+    column_choices = dict(
+        admin=[('111', u'酒吧管理员')]
+    )
+    column_labels = {
+        'name': u'用户名',
+        'admin': u'权限',
+        'password': u'密码',
+        'sign_up_date': u'注册时间',
+        'pub.name': u'酒吧'
+    }
+    column_list = ('pub.name', 'name', 'admin', 'sign_up_date')
     can_create = False
     can_delete = False
     pub_user_filter = '111'
