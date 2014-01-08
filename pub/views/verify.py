@@ -47,7 +47,7 @@ class Verify(object):
         """编辑礼物的信息的权限"""
         pub = Pub.query.filter(Pub.id == pub_id).first()
 
-        if pub and (int(Pub.id) == int(login.current_user.pub_id)):
+        if pub and (int(pub.id) == int(login.current_user.pub_id)):
             return True
 
         return False
