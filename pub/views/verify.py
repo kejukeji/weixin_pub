@@ -6,6 +6,7 @@ from flask.ext import login
 from ..models.user import User
 from ..models.ticket import Ticket
 from ..models.gift import Gift
+from ..models.pub import Pub
 
 
 class Verify(object):
@@ -37,6 +38,16 @@ class Verify(object):
         gift = Gift.query.filter(Gift.id == gift_id).first()
 
         if gift and (int(gift.pub_id) == int(login.current_user.pub_id)):
+            return True
+
+        return False
+
+    @staticmethod
+    def valid_pub_manager(pub_id):
+        """编辑礼物的信息的权限"""
+        pub = Pub.query.filter(Pub.id == pub_id).first()
+
+        if pub and (int(Pub.id) == int(login.current_user.pub_id)):
             return True
 
         return False

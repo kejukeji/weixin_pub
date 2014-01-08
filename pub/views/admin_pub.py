@@ -24,6 +24,7 @@ from ..utils.others import form_to_dict
 from ..utils.ex_file import time_file_name, allowed_file_extension
 from ..utils.ex_object import delete_attrs
 from ..weixin.menu import create_menu
+from .verify import Verify
 from werkzeug import secure_filename
 
 from ..setting import (PICTURE_ALLOWED_EXTENSION, PUB_PICTURE_BASE_PATH, PUB_PICTURE_REL_PATH)
@@ -239,7 +240,7 @@ class PubView(ModelView):
         return login.current_user.is_normal_superuser()
 
 
-class SinglePubView(PubView):
+class SinglePubView(PubView, Verify):
     """酒吧管理员管理管理自己酒吧的视图"""
 
     can_create = False
@@ -263,6 +264,56 @@ class SinglePubView(PubView):
                                        description=u'为了更好的展示效果，严格使用640 * 288的图片，仅支持png与jpeg(jpg)格式')
 
         return form_class
+
+    @expose('/edit/', methods=('GET', 'POST'))
+    def edit_view(self):
+        """
+            Edit model view
+        """
+        return_url = request.args.get('url') or url_for('.index_view')
+
+        if not self.can_edit:
+            return redirect(return_url)
+
+        id = get_mdict_item_or_list(request.args, 'id')
+        if id is None:
+            return redirect(return_url)
+
+        if not self.valid_pub_manager(id):
+            return redirect(return_url)
+
+        model = self.get_one(id)
+
+        if model is None:
+            return redirect(return_url)
+
+        model.status = ((model.status or 0) and 1)  # 使用1与0
+
+        user = AdminUser.query.filter(AdminUser.pub_id == id).filter(AdminUser.admin == '111').first()
+        if user is None:
+            flash(u'这个酒吧还没有管理员哦')
+            model.user = None
+            model.password = None
+        else:
+            model.user = user.name
+            model.password = user.password
+
+        form = self.edit_form(obj=model)
+
+        if validate_form_on_submit(form):
+            if self.update_model(form, model):
+                if '_continue_editing' in request.form:
+                    flash(gettext('Model was successfully saved.'))
+                    return redirect(request.full_path)
+                else:
+                    return redirect(return_url)
+
+        return self.render(self.edit_template,
+                           model=model,
+                           form=form,
+                           form_opts=get_form_opts(self),
+                           form_rules=self._form_edit_rules,
+                           return_url=return_url)
 
     def is_accessible(self):
         return login.current_user.is_normal_manageruser()
