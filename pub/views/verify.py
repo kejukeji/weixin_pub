@@ -24,7 +24,7 @@ class Verify(object):
     @staticmethod
     def valid_ticket_manager(ticket_id):
         """编辑优惠券的信息的权限"""
-        ticket = Ticket.query.filter(Ticket.id == ticket_id).first
+        ticket = Ticket.query.filter(Ticket.id == ticket_id).first()
 
         if ticket and (int(ticket.pub_id) == int(login.current_user.pub_id)):
             return True
@@ -34,7 +34,7 @@ class Verify(object):
     @staticmethod
     def valid_gift_manager(gift_id):
         """编辑礼物的信息的权限"""
-        gift = Gift.query.filter(Gift.id == gift_id).first
+        gift = Gift.query.filter(Gift.id == gift_id).first()
 
         if gift and (int(gift.pub_id) == int(login.current_user.pub_id)):
             return True
