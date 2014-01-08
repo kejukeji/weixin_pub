@@ -18,6 +18,7 @@ class Pub(Base, InitUpdate):
     access_token  服务器获取的验证
     appid 微信号的appid
     secret 微信号的secret
+    status 0 暂停 1运营
     """
 
     __tablename__ = 'pub'

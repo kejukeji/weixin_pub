@@ -11,7 +11,8 @@ from ..setting import BASE_URL
 from ..models.user import User
 from ..weixin.cons_string import (BIND_ERROR_FORMAT, ALREADY_BIND, BIND_SUCCESS, NORMAL_REPLY,
                                   NOT_BIND, CHANGE_ERROR_FORMAT, CHANGE_SUCCESS, CHANGE_NONE,
-                                  ALREADY_EXIST, NO_ACTIVITY, NO_GIFT, HAS_GIFT, NOT_USER_GIFT, HAS_ROLL)
+                                  ALREADY_EXIST, NO_ACTIVITY, NO_GIFT, HAS_GIFT, NOT_USER_GIFT, HAS_ROLL,
+                                  NOT_VALID_PUB)
 from ..models import db
 from ..models.ticket import Ticket, UserTicket
 from ..models.gift import Gift, UserGift, UserGiftTime
@@ -33,6 +34,9 @@ def weixin(pub_id):
         # 这里需要验证 #todo
         xml_recv = ET.fromstring(request.data)
         MsgType = xml_recv.find("MsgType").text
+
+        if not valid_pub(pub_id):
+            return not_valid_pub_reply(xml_recv, web_chat)
 
         if MsgType == "event":
             return response_event(xml_recv, web_chat, pub_id)
@@ -402,3 +406,26 @@ def valid_user(pub_id, user):
 def ticket_url(ticket_id, open_id):
     """返回优惠券的详情页路径"""
     return BASE_URL + "/ticket/" + str(ticket_id) + "?open_id="+str(open_id)
+
+
+def valid_pub(pub_id):
+    """判断pub是不是被冻结了，没有冻结返回True，冻结返回False"""
+    pub = get_pub(pub_id)
+
+    if pub and int(pub.status) == 1:
+        return True
+
+    return False
+
+
+def not_valid_pub_reply(xml_recv, web_chat):
+    """如果酒吧被冻结了，返回冻结的返回内容"""
+    ToUserName = xml_recv.find("ToUserName").text
+    FromUserName = xml_recv.find("FromUserName").text
+
+    reply_dict = {
+        "ToUserName": FromUserName,
+        "FromUserName": ToUserName,
+        "Content": NOT_VALID_PUB
+    }
+    return response(web_chat, reply_dict, "text")
