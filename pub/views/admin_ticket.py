@@ -22,11 +22,12 @@ from ..utils.ex_file import time_file_name, allowed_file_extension
 from ..utils.ex_object import delete_attrs
 from werkzeug import secure_filename
 from ..setting import PICTURE_ALLOWED_EXTENSION, TICKET_PICTURE_BASE_PATH, TICKET_PICTURE_REL_PATH
+from .verify import Verify
 
 log = logging.getLogger("flask-admin.sqla")
 
 
-class TicketView(ModelView):
+class TicketView(ModelView, Verify):
     """优惠券管理视图"""
 
     page_size = 30
@@ -317,6 +318,10 @@ class TicketView(ModelView):
         if id is None:
             return redirect(return_url)
 
+        # 检测编辑优惠券资料的是不是相应的管理员
+        if not self.valid_ticket_manager(id):
+            return redirect(return_url)
+
         model = self.get_one(id)
 
         if model is None:
@@ -351,7 +356,7 @@ class TicketView(ModelView):
         return pub_id
 
 
-class UserTicketView(ModelView):
+class UserTicketView(ModelView, Verify):
     """"用户的优惠券管理"""
     page_size = 30
     can_delete = False
@@ -421,6 +426,10 @@ class UserTicketView(ModelView):
             query = query.filter(UserTicket.user_id == '-1')  # 不显示任何的优惠券信息
         else:
             query = query.filter(UserTicket.user_id == user_id)
+
+        if not self.valid_user_manager(user_id):
+            flash(u'系统错误，不存在本用户', 'error')
+            query = query.filter(UserTicket.user_id == '-1')  # 不显示任何的优惠券信息
 
         # Apply search criteria
         if self._search_supported and search:
@@ -616,6 +625,9 @@ class UserTicketView(ModelView):
             return redirect(return_url)
 
         user_id = int(model.user_id)
+        if not self.valid_user_manager(user_id):
+            flash("系统错误，酒吧没有本会员", "error")
+            return redirect(return_url)
         return_url += "?user_id=" + str(user_id)  # 返回到会员的优惠券管理页面
 
         model.status = ((model.status or 0) and 1)  # 使用1与0

@@ -21,6 +21,7 @@ from ..models.admin_user import AdminUser
 from ..models.user import User
 from ..utils.others import form_to_dict
 from ..utils.ex_object import delete_attrs
+from .verify import Verify
 
 
 class SuperUserView(ModelView):
@@ -297,7 +298,7 @@ class ManagerUserView(SuperUserView):
         ModelView.__init__(self, AdminUser, db, **kwargs)
 
 
-class UserView(ModelView):
+class UserView(ModelView, Verify):
     """酒吧会员管理"""
 
     can_create = False
@@ -540,6 +541,10 @@ class UserView(ModelView):
 
         id = get_mdict_item_or_list(request.args, 'id')
         if id is None:
+            return redirect(return_url)
+
+        # 检测编辑用户资料的是不是相应的管理员
+        if not self.valid_user_manager(id):
             return redirect(return_url)
 
         model = self.get_one(id)

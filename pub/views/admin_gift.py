@@ -18,12 +18,13 @@ from flask.ext.admin.contrib.sqla import tools
 from ..models.gift import Gift, UserGift
 from ..utils.others import form_to_dict
 from ..utils.ex_object import delete_attrs
+from .verify import Verify
 from werkzeug import secure_filename
 
 log = logging.getLogger("flask-admin.sqla")
 
 
-class GiftView(ModelView):
+class GiftView(ModelView, Verify):
     """优惠券管理视图"""
 
     page_size = 30
@@ -297,6 +298,9 @@ class GiftView(ModelView):
         if id is None:
             return redirect(return_url)
 
+        if not self.valid_gift_manager(id):
+            return redirect(return_url)
+
         model = self.get_one(id)
 
         if model is None:
@@ -328,7 +332,7 @@ class GiftView(ModelView):
         return pub_id
 
 
-class UserGiftView(ModelView):
+class UserGiftView(ModelView, Verify):
     """"用户的奖品管理"""
     page_size = 30
     can_delete = False
@@ -398,6 +402,10 @@ class UserGiftView(ModelView):
             query = query.filter(UserGift.user_id == '-1')  # 不显示任何的优惠券信息
         else:
             query = query.filter(UserGift.user_id == user_id)
+
+        if not self.valid_user_manager(user_id):
+            flash(u'系统错误，不存在本用户', 'error')
+            query = query.filter(UserGift.user_id == '-1')  # 不显示任何的优惠券信息
 
         # Apply search criteria
         if self._search_supported and search:
@@ -593,6 +601,9 @@ class UserGiftView(ModelView):
             return redirect(return_url)
 
         user_id = int(model.user_id)
+        if not self.valid_user_manager(user_id):
+            flash("系统错误，酒吧没有本会员", "error")
+            return redirect(return_url)
         return_url += "?user_id=" + str(user_id)  # 返回到会员的奖品管理页面
 
         model.status = ((model.status or 0) and 1)  # 使用1与0
