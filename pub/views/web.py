@@ -7,12 +7,14 @@ from ..models import db
 from ..models.ticket import Ticket, UserTicket
 from ..models.user import User
 from ..models.tools import get_one
+from ..restful.verify import url
 
 
 def pub_home(pub_id):
     pub = get_one(Pub, pub_id)
+    content_url = url(pub_id)
     if pub:
-        return render_template('pub_home.html', pub=pub)
+        return render_template('pub_home.html', pub=pub, content_url=content_url)
 
     return u"没有查找到相关酒吧"
 
