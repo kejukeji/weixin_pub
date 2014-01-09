@@ -11,12 +11,12 @@
         WeixinJSBridge.call('hideToolbar');
     });
     var dataForWeixin={
-        appId: {{ pub.appid }}
-        MsgImg: {{ pub.picture_url() }},
-        TLImg: {{ pub.picture_url() }},
-        url:{{ content_url }},
-        title: {{ pub.name }},
-        desc: {{ pub.intro }},
+        appId: "{{ pub.appid }}",
+        MsgImg: "{{ pub.picture_url() }}",
+        TLImg: "{{ pub.picture_url() }}",
+        url: "{{ content_url }}",
+        title: "{{ pub.name }}",
+        desc: "{{ pub.intro }}",
         fakeid:"",
         callback:function(){}
     };
