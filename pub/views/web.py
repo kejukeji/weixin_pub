@@ -21,7 +21,7 @@ def pub_home(pub_id):
 
 def ticket_home(ticket_id):
     ticket = get_one(Ticket, ticket_id)
-    open_id = request.args.get('open_id')
+    open_id = request.args.get('open_id', None)
     user = User.query.filter(User.open_id == open_id, User.pub_id == int(ticket.pub_id)).first()
     add = request.args.get('add', '0')
 
@@ -45,9 +45,14 @@ def ticket_home(ticket_id):
 
     if ticket:
         message = user_ticket_message(ticket_id, open_id)
-        url = BASE_URL + "/ticket/" + str(ticket_id) + "?open_id=" + str(open_id) + "&add=1"
+        if open_id:
+            url = BASE_URL + "/ticket/" + str(ticket_id) + "?open_id=" + str(open_id) + "&add=1"
+        else:
+            url = BASE_URL + "/ticket/" + str(ticket_id)  # 如果是分享过来的链接，用户无法添加
+        content_url = BASE_URL + "/ticket/" + str(ticket_id)
         pub = get_one(Pub, int(ticket.pub_id))
-        return render_template('ticket_home.html', ticket=ticket, message=message, content_url=url, pub=pub)
+        return render_template('ticket_home.html', ticket=ticket, message=message,
+                               url=url, pub=pub, content_url=content_url)
 
     return u'没有查找到相关优惠'
 
