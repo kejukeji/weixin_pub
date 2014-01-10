@@ -46,7 +46,8 @@ def ticket_home(ticket_id):
     if ticket:
         message = user_ticket_message(ticket_id, open_id)
         url = BASE_URL + "/ticket/" + str(ticket_id) + "?open_id=" + str(open_id) + "&add=1"
-        return render_template('ticket_home.html', ticket=ticket, message=message, url=url)
+        pub = get_one(Pub, int(ticket.pub_id))
+        return render_template('ticket_home.html', ticket=ticket, message=message, content_url=url, pub=pub)
 
     return u'没有查找到相关优惠'
 
