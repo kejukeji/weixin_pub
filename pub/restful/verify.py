@@ -235,7 +235,8 @@ def discount_reply(pub, xml_recv):
     if ticket_list or gift_list:
         message = ""
         if user:
-            message += "您的会员卡积分：\n" + str(user.card_credit) + "您的会员卡余额：\n" + str(user.card_money) + "\n"
+            message += "您的会员卡积分：\n" + str(float(user.card_credit)) + "\n" + \
+                       "您的会员卡余额：\n" + str(float(user.card_money)) + "\n"
         if ticket_list:
             message += "您的优惠券信息如下：\n\n"
             for ticket in ticket_list:
