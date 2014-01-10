@@ -8,9 +8,10 @@ from flask import flash, redirect, request, url_for
 from flask.ext.admin.base import expose
 from flask.ext.admin.babel import gettext
 from flask.ext.admin.model.helpers import get_mdict_item_or_list
+from wtforms.fields import FileField, TextAreaField
+from wtforms import validators
 from flask.ext.admin.helpers import validate_form_on_submit
 from flask.ext.admin.form import get_form_opts
-from wtforms.fields import FileField
 from flask.ext import login
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
@@ -69,7 +70,8 @@ class TicketView(ModelView, Verify):
     def scaffold_form(self):
         """改写form"""
         form_class = super(TicketView, self).scaffold_form()
-        delete_attrs(form_class, ('base_path', 'rel_path', 'pic_name', 'pub', 'create_time'))
+        delete_attrs(form_class, ('base_path', 'rel_path', 'pic_name', 'pub', 'create_time', 'intro'))
+        form_class.intro = TextAreaField(label=u'优惠券介绍', validators=[validators.required(), validators.length(max=256)])
         form_class.picture = FileField(label=u'优惠券图片', description=u'推荐使用640*288')
 
         return form_class
