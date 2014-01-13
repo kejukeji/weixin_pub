@@ -225,7 +225,7 @@ def discount_reply(pub, xml_recv):
         ticket_list = db.query(Ticket).join(UserTicket).filter(UserTicket.status == 0,
                                                                UserTicket.user_id == int(user.id),
                                                                Ticket.stop_time >= datetime.datetime.now()).all()
-        gift_list = db.query(Gift).join(UserGift).filter(UserGift.status == 0,
+        gift_list = db.query(UserGift).join(Gift).filter(UserGift.status == 0,
                                                          UserGift.user_id == int(user.id),
                                                          Gift.stop_time >= datetime.datetime.now()).all()
     else:
@@ -244,7 +244,8 @@ def discount_reply(pub, xml_recv):
                            str(ticket.start_time) + " - " + str(ticket.stop_time) + "\n\n"
         if gift_list:
             message += "\n您的获奖信息如下：\n\n"
-            for gift in gift_list:
+            for user_gift in gift_list:
+                gift = get_gift(int(user_gift.gift_id))
                 message += str(gift.title) + " - " + str(gift.intro) + "\n\n" + "有效时间：" + \
                            str(gift.start_time) + " - " + str(gift.stop_time) + "\n\n"
     else:
@@ -257,6 +258,10 @@ def discount_reply(pub, xml_recv):
     }
 
     return reply_dict, reply_type
+
+
+def get_gift(gift_id):
+    return Gift.query.filter(Gift.id == gift_id).first()
 
 
 def activity_reply(pub, xml_recv):
