@@ -87,7 +87,7 @@
     <p>有效时间：</p>
     <p>{{ ticket.start_time.__str__()[0:10] }} 至 {{ ticket.stop_time.__str__()[0:10] }}</p>
     <p>领取规则：</p>
-    {% if ticket.repeat.__int__() == 0 %}
+    {% if ticket.repeat.__int__() == 1 %}
     <p>本优惠券每人限领一次。</p>
     {% else %}
     <p>本店促销，优惠券可以多次领取哦。</p>
